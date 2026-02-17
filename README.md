@@ -1,0 +1,1 @@
+This is the general code for the robot, please be careful when making edits and make sure that you are working in the correct folder and making the correct edits. We will deploy this SRC folder when everything is complete. Please make small changes and work one step at a time so that we can chekc for bugs and errors!
