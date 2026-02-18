@@ -16,9 +16,15 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -45,7 +51,41 @@ public class RobotContainer {
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
+     // Fuel Intake game variables
+     private final SparkMax fuelIntake;
+     private static final int CAN_ID = 15;
+     private static final double INTAKE_MOTOR_SPEED = -0.3; // Change this value to adjust the motor speed
+     private static final double REVERSE_INTAKE_MOTOR_SPEED = .125;
+     private static final double INTAKE_AUTO = -0.25;
+     private static final double INTAKE_STOP = 0;
+ 
+     // endgame variables
+     private final SparkMax endGame;
+     private static final int CAN_ID2 = 16;
+     private static final double ENDGAME_MOTOR_SPEED = 0.55; // Change this value to adjust the motor speed
+ 
+     // slowMode variables
+     private boolean slowMode = false;
+     private boolean fastMode = false;
+ 
     public RobotContainer() {
+
+        fuelIntake = new SparkMax(CAN_ID, MotorType.kBrushless);
+        SparkMaxConfig neoConfig = new SparkMaxConfig();
+        neoConfig.inverted(false).idleMode(IdleMode.kCoast);
+
+        endGame = new SparkMax(CAN_ID2, MotorType.kBrushless);
+        SparkMaxConfig neoConfig2 = new SparkMaxConfig();
+        neoConfig2.inverted(false).idleMode(IdleMode.kBrake);
+
+        NamedCommands.registerCommand("Score", Commands.runOnce(()->{
+            fuelIntake.set(INTAKE_AUTO);
+        }));
+        
+        NamedCommands.registerCommand("Stop", Commands.runOnce(()->{
+            fuelIntake.set(INTAKE_STOP);
+        }));
+        
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
 
@@ -56,15 +96,38 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+
+            joystick.povLeft().onTrue(Commands.runOnce(() -> {  // Use onTrue() to toggle slowMode
+            slowMode = !slowMode; // Toggle slow mode
+            fastMode = false;
+            updateDriveModeDashboard();
+        }, drivetrain));
+
+        joystick.povRight().onTrue(Commands.runOnce(() -> {
+            fastMode = !fastMode; // toggle fast mode
+            slowMode = false;
+            updateDriveModeDashboard();
+        }, drivetrain));
+        
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
+             drivetrain.applyRequest(() -> {
+                double speedFactor;
+                if(slowMode){
+                    speedFactor = 0.2;
+                }
+                else if(fastMode){
+                    speedFactor = 1.0;
+                }
+                else{
+                    speedFactor = 0.75;
+                }
+                return drive.withVelocityX(-joystick.getLeftY() * MaxSpeed* 0.5 * speedFactor) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.5 * speedFactor) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * 0.5 * speedFactor); // Drive counterclockwise with negative X (left)
+            })
         );
 
         // Idle while the robot is disabled. This ensures the configured
@@ -75,14 +138,16 @@ public class RobotContainer {
         );
 
         joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
-        ));
+        joystick.b().whileTrue(Commands.run(() ->{
+            fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED);
+    }, drivetrain)).whileFalse(Commands.run(()->{
+        fuelIntake.set(0);
+    }, drivetrain));
 
-        joystick.povUp().whileTrue(drivetrain.applyRequest(() ->
+        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
-        joystick.povDown().whileTrue(drivetrain.applyRequest(() ->
+        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
 
@@ -93,12 +158,47 @@ public class RobotContainer {
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
+        // reset the field-centric heading on left bumper press
+        joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+
         // Reset the field-centric heading on left bumper press.
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+         // Intake is a motor controller that is controlled by the right bumper
+         joystick.rightBumper().onTrue(Commands.run(() -> {
+            fuelIntake.set(INTAKE_MOTOR_SPEED);
+        }, drivetrain)).whileFalse(Commands.run(() -> {
+            fuelIntake.set(0);
+        }, drivetrain));
     }
 
+   /*    
+       // Climber goes up
+        joystick.povDown().whileTrue(Commands.run(() -> {
+           endGame.set(ENDGAME_MOTOR_SPEED);
+        }, drivetrain)).whileFalse(Commands.run(() -> {
+            endGame.set(0);
+        }, drivetrain));
+        // Climber goes down
+        joystick.povUp().whileTrue(Commands.run(() -> {
+            endGame.set(-ENDGAME_MOTOR_SPEED);
+        }, drivetrain)).whileFalse(Commands.run(() -> {
+            endGame.set(0);
+        }, drivetrain));
+    }
+*/
+
+    private void updateDriveModeDashboard() {
+        if (slowMode) {
+        SmartDashboard.putString("Drive Mode", "Slow");
+        } else if (fastMode) {
+        SmartDashboard.putString("Drive Mode", "Fast");
+        } else {
+        SmartDashboard.putString("Drive Mode", "Normal"); // Or "Default", or whatever you want to call it
+        }
+     }
+    
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
