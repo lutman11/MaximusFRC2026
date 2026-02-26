@@ -17,6 +17,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -43,6 +44,48 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    
+// Find the goal point and then move to it
+    // Static scoring location (CURRENTLY PLACEHOLDER COORDINATES)
+    private static final Pose2d goalPose =
+        new Pose2d(
+            8.0, // X meters
+            4.0, // Y meters
+            Rotation2d.fromDegrees(180)
+        );
+    // This command returns the point the Robot should travel to in order to score
+    public Pose2d getGoalPose() {
+        return goalPose;
+    }
+    // This command returns the Robot's current position
+    public Pose2d getCurrentPose() {
+        return getState().Pose;
+    }
+    // Find the poseError (distance from goal)
+    public Pose2d getPoseError() {
+        Pose2d current = getCurrentPose();
+        Pose2d goal = getGoalPose();
+
+        double errorX = goal.getX() - current.getX();
+        double errorY = goal.getY() - current.getX();
+        double errorRot = goal.getRotation().minus(current.getRotation()).getRadians();
+
+        return new Pose2d(errorX, errorY, new Rotation2d(errorRot));
+    }
+    
+    private final PIDController xController = new PIDController(1.0, 0, 0);
+    private final PIDController yController = new PIDController(1.0, 0, 0);
+    private final PIDController thetaController = new PIDController(2.0, 0, 0);
+
+    public void driveToGoal(Pose2d currentPose, Pose2d goalPose) {
+        // will finish later today, sorry
+    }
+    
+    // Using an example position, below tests the capabilities of the above code
+    drive.setCurrentPoseForTesting(2, 1, 45);
+    Pose2d error = drive.getPoseError();
+    System.out.println("Robot's distance from goalPose:");
+    System.out.println(error);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
