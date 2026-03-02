@@ -1,4 +1,4 @@
- // Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import com.revrobotics.spark.SparkMax;
@@ -35,6 +36,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.ShooterSubsystem;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -55,6 +57,9 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    private final ShooterSubsystem shooter = new ShooterSubsystem();;
+    
+
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
@@ -68,23 +73,9 @@ public class RobotContainer {
      private static final double SHOOTER_AUTO = 0.25;
      private static final double SHOOTER_STOP = 0;
 
-    // Shooter game variables
-    private final TalonFX dragger;
-    private static final int CAN_IDD = 31;
-    private static final double DRAGGER_MOTOR_SPEED = -0.1; // Negative is clockwise, this spins the same way as the intake
-        
-    private final TalonFX pullUp;
-    private static final int CAN_IDPU = 32;
-    private static final double PULLUP_MOTOR_SPEED = -0.3; 
-    
-    private final TalonFX flyWheel;
-    private static final int CAN_IDFW = 33;
-    private static final double FLYWHEEL_MOTOR_SPEED = -0.4;
-    
- 
      // endgame variables
      private final SparkMax endGame;
-     private static final int CAN_ID2 = 16;
+     private static final int CAN_IDblank = 100000;
      private static final double ENDGAME_MOTOR_SPEED = 0.55; // Change this value to adjust the motor speed
  
      // slowMode variables
@@ -94,20 +85,13 @@ public class RobotContainer {
     public RobotContainer() {
 
         fuelIntake = new TalonFX(CAN_IDFI);
-        dragger = new TalonFX(CAN_IDD);
-        pullUp = new TalonFX(CAN_IDPU);
-        flyWheel = new TalonFX(CAN_IDFW);
-        
+
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-        
         fuelIntake.getConfigurator().apply(config);
-        dragger.getConfigurator().apply(config);
-        pullUp.getConfigurator().apply(config);
-        flyWheel.getConfigurator().apply(config);
 
-        endGame = new SparkMax(CAN_ID2, MotorType.kBrushless);
+        endGame = new SparkMax(CAN_IDblank, MotorType.kBrushless);
         SparkMaxConfig neoConfig2 = new SparkMaxConfig();
         neoConfig2.inverted(false).idleMode(IdleMode.kBrake);
 
@@ -127,7 +111,6 @@ public class RobotContainer {
             fuelIntake.set(SHOOTER_STOP);
         }));
         
-
 
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -208,24 +191,20 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
-         
-        // Intake is a Kraken motor controller that is controlled by the right bumper
-         joystick.rightBumper().onTrue(Commands.run(() -> {
-            fuelIntake.set(INTAKE_MOTOR_SPEED);
-        }, drivetrain)).whileFalse(Commands.run(() -> {
-            fuelIntake.set(0);
-        }, drivetrain));
+        
+         // Intake is a motor controller that is controlled by the right bumper
 
-        // This binding controlls all the motors for the shoot operation
-        joystick.rightTrigger().onTrue(Commands.run(() -> {
-            dragger.set(DRAGGER_MOTOR_SPEED);
-            pullUp.set(PULLUP_MOTOR_SPEED);
-            flyWheel.set(FLYWHEEL_MOTOR_SPEED);
-        }, drivetrain)).whileFalse(Commands.run(() -> {
-            dragger.set(0);
-            pullUp.set(0);
-            flyWheel.set(0);
-        }, drivetrain));
+        Trigger leftJoystickMoved = new Trigger(() ->
+        Math.abs(joystick.getLeftX()) > 0.10 || Math.abs(joystick.getLeftY()) > 0.10);
+
+        Trigger intakeTrigger = joystick.rightBumper().or(leftJoystickMoved.and(joystick.rightBumper()));
+
+        intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
+            .whileFalse(Commands.run(() -> fuelIntake.set(0)));
+
+        joystick.rightTrigger()
+        .whileTrue(shooter.getShootCommand());
+        
     }
 
    /*    
