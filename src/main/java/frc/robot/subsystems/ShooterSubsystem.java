@@ -57,10 +57,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     /** Returns a command that runs the shooter while held */
-    public Runnable getShootCommand() {
-        return Commands.run(() -> startShooter(), this)
-                       .until(() -> false)
-                       .finallyDo(interrupted -> stopShooter());
+   public Command getShootCommand() {
+    return Commands.run(() -> startShooter(), this)
+                   .finallyDo(interrupted -> stopShooter());
     }
 
 }
