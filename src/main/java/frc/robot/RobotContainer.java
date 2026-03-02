@@ -1,4 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
+ // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -68,8 +68,19 @@ public class RobotContainer {
      private static final double SHOOTER_AUTO = 0.25;
      private static final double SHOOTER_STOP = 0;
 
-
-
+    // Shooter game variables
+    private final TalonFX dragger;
+    private static final int CAN_IDD = 31;
+    private static final double DRAGGER_MOTOR_SPEED = -0.1; // Negative is clockwise, this spins the same way as the intake
+        
+    private final TalonFX pullUp;
+    private static final int CAN_IDPU = 32;
+    private static final double PULLUP_MOTOR_SPEED = -0.3; 
+    
+    private final TalonFX flyWheel;
+    private static final int CAN_IDFW = 33;
+    private static final double FLYWHEEL_MOTOR_SPEED = -0.4;
+    
  
      // endgame variables
      private final SparkMax endGame;
@@ -83,11 +94,18 @@ public class RobotContainer {
     public RobotContainer() {
 
         fuelIntake = new TalonFX(CAN_IDFI);
-
+        dragger = new TalonFX(CAN_IDD);
+        pullUp = new TalonFX(CAN_IDPU);
+        flyWheel = new TalonFX(CAN_IDFW);
+        
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+        
         fuelIntake.getConfigurator().apply(config);
+        dragger.getConfigurator().apply(config);
+        pullUp.getConfigurator().apply(config);
+        flyWheel.getConfigurator().apply(config);
 
         endGame = new SparkMax(CAN_ID2, MotorType.kBrushless);
         SparkMaxConfig neoConfig2 = new SparkMaxConfig();
@@ -190,11 +208,23 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
-         // Intake is a motor controller that is controlled by the right bumper
+         
+        // Intake is a Kraken motor controller that is controlled by the right bumper
          joystick.rightBumper().onTrue(Commands.run(() -> {
             fuelIntake.set(INTAKE_MOTOR_SPEED);
         }, drivetrain)).whileFalse(Commands.run(() -> {
             fuelIntake.set(0);
+        }, drivetrain));
+
+        // This binding controlls all the motors for the shoot operation
+        joystick.rightTrigger().onTrue(Commands.run(() -> {
+            dragger.set(DRAGGER_MOTOR_SPEED);
+            pullUp.set(PULLUP_MOTOR_SPEED);
+            flyWheel.set(FLYWHEEL_MOTOR_SPEED);
+        }, drivetrain)).whileFalse(Commands.run(() -> {
+            dragger.set(0);
+            pullUp.set(0);
+            flyWheel.set(0);
         }, drivetrain));
     }
 
