@@ -24,9 +24,13 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final int CAN_ID_PULLUP = 32;
     private static final int CAN_ID_FLYWHEEL = 33;
 
-    private static final double DRAGGER_SPEED = -0.1;
+    private static final double DRAGGER_SPEED = 0.2;
     private static final double PULLUP_SPEED = -0.3;
     private static final double FLYWHEEL_SPEED = -0.4;
+
+    private static final double DRAGGER_SPEED_R = -0.2;
+    private static final double PULLUP_SPEED_R = 0.3;
+    private static final double FLYWHEEL_SPEED_R = 0.4; 
 
     public ShooterSubsystem() {
         dragger = new TalonFX(CAN_ID_DRAGGER);
