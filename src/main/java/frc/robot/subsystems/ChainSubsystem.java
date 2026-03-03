@@ -6,38 +6,33 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-/**
- * Subsystem that handles chain mechanism:
- * - Chain motor
- */
+public class ChainSubsystem extends SubsystemBase {
 
-public class ChainSubsystem extends SubsystemBase
+    private final TalonFX chainMotor;
+    private static final int CAN_ID_CHAIN = 34;
 
-// New Kraken motor
-private final TalonFX chain;
-private static final int CAN_ID_SLOW = 34;   // (change to actual CAN ID) 
+    private static final double CHAIN_FORWARD = 0.05;
+    private static final double CHAIN_REVERSE = -0.05;
 
-private static final double SLOW_FORWARD = 0.05;
-private static final double SLOW_REVERSE = -0.05;
-
- private static final double CURRENT_LIMIT = 40.0;   // amps (tune this)
-    private static final double VELOCITY_THRESHOLD = 1.0; // near zero velocity
-    private static final double STALL_DELAY = 0.25; // seconds
+    private static final double CURRENT_LIMIT = 40.0;
+    private static final double VELOCITY_THRESHOLD = 1.0;
+    private static final double STALL_DELAY = 0.25;
 
     private final Timer stallTimer = new Timer();
     private boolean stallDetected = false;
 
-public ChainSubsystem() { 
+    public ChainSubsystem() {
+        chainMotor = new TalonFX(CAN_ID_CHAIN);
 
-chain = new TalonFX(CAN_ID_CHAIN);
+        TalonFXConfiguration config = new TalonFXConfiguration();
+        config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
-TalonFXConfiguration slowConfig = new TalonFXConfiguration();
-slowConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-slowConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-chain.getConfigurator().apply(slowConfig);
+        chainMotor.getConfigurator().apply(config);
+    }
 
     private void runWithProtection(double speed) {
 
@@ -55,7 +50,7 @@ chain.getConfigurator().apply(slowConfig);
             }
 
             if (stallTimer.hasElapsed(STALL_DELAY)) {
-                chainMotor.set(0); // Stop motor after delay
+                chainMotor.set(0);
                 return;
             }
 
@@ -81,21 +76,19 @@ chain.getConfigurator().apply(slowConfig);
         stallDetected = false;
         stallTimer.stop();
         stallTimer.reset();
+    }
 
-     // Command to run chain forward with protection
     public Command intakeDrop() {
-    return Commands.run(
-        () -> moveForward(),
-        this
-    ).finallyDo(interrupted -> stop());
-}
+        return Commands.run(
+            () -> moveForward(),
+            this
+        ).finallyDo(interrupted -> stop());
+    }
 
-// Command to run chain in reverse with protection
-public Command intakeLift() {
-    return Commands.run(
-        () -> moveReverse(),
-        this
-    ).finallyDo(interrupted -> stop());
-}
+    public Command intakeLift() {
+        return Commands.run(
+            () -> moveReverse(),
+            this
+        ).finallyDo(interrupted -> stop());
     }
 }
