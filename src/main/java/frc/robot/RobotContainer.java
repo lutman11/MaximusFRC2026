@@ -38,6 +38,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.LinearServo;
+import frc.robot.subsystems.ChainMotor;
+
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -58,9 +60,11 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    private final ShooterSubsystem shooter = new ShooterSubsystem();;
+    private final ShooterSubsystem shooter = new ShooterSubsystem();
 
     private final LinearServo linearServo;
+
+    private final ChainMotor battleBus = new ChainMotor();
     
 
     /* Path follower */
@@ -223,6 +227,12 @@ public class RobotContainer {
 
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
+
+        joystick.rightStick()
+        .onTrue(battleBus.intakeDrop());
+
+        joystick.leftStick()
+        .onTrue(battleBus.intakeLift());
         
     }
 
