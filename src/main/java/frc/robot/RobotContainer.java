@@ -124,8 +124,7 @@ public class RobotContainer {
         FollowPathCommand.warmupCommand().schedule();
 
         //  Linear Servo Constants
-         linearServo = new LinearServo(3, 144, 20);
-        Commands.run(() -> actuator.updateCurPos()).schedule();
+         linearServo = new LinearServo(3, 70, 0);
     }
 
     private void configureBindings() {
@@ -208,6 +207,8 @@ public class RobotContainer {
         joystick.y().onTrue(Commands.runOnce(() -> {
             linearServo.setPosition(0.0); // retract
         }));
+
+          Commands.run(() -> linearServo.updateCurPos()).schedule();
     */
         
          // Intake is a motor controller that is controlled by the right bumper
