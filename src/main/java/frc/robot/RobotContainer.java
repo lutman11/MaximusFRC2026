@@ -37,6 +37,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.LinearServo;
 
 public class RobotContainer {
     private double MaxSpeed = 1.0 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -58,6 +59,8 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     private final ShooterSubsystem shooter = new ShooterSubsystem();;
+
+    private final LinearServo linearServo;
     
 
     /* Path follower */
@@ -119,6 +122,10 @@ public class RobotContainer {
 
         // Warmup PathPlanner to avoid Java pauses
         FollowPathCommand.warmupCommand().schedule();
+
+        //  Linear Servo Constants
+         linearServo = new LinearServo(3, 144, 20);
+        Commands.run(() -> actuator.updateCurPos()).schedule();
     }
 
     private void configureBindings() {
@@ -191,6 +198,17 @@ public class RobotContainer {
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+    /*
+        // Joystick control Controlling Servo
+        joystick.x().onTrue(Commands.runOnce(() -> {
+            linearServo.setPosition(70.0); // extend
+        }));
+
+        joystick.y().onTrue(Commands.runOnce(() -> {
+            linearServo.setPosition(0.0); // retract
+        }));
+    */
         
          // Intake is a motor controller that is controlled by the right bumper
 
