@@ -19,8 +19,8 @@ public class ChainSubsystem extends SubsystemBase
 private final TalonFX chain;
 private static final int CAN_ID_SLOW = 34;   // (change to actual CAN ID) 
 
-private static final double SLOW_FORWARD = .05;
-private static final double SLOW_REVERSE = -.05;
+private static final double SLOW_FORWARD = 0.05;
+private static final double SLOW_REVERSE = -0.05;
 
 public ChainSubsystem() { 
 
