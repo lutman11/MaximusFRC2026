@@ -7,3 +7,28 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+
+/**
+ * Subsystem that handles chain mechanism:
+ * - Chain motor
+ */
+
+public class ChainSubsystem extends SubsystemBase
+
+// New Kraken motor
+private final TalonFX chain;
+private static final int CAN_ID_SLOW = 34;   // (change to actual CAN ID) 
+
+private static final double SLOW_FORWARD = .05;
+private static final double SLOW_REVERSE = -.05;
+
+public ChainSubsystem() { 
+
+chain = new TalonFX(CAN_ID_CHAIN);
+
+TalonFXConfiguration slowConfig = new TalonFXConfiguration();
+slowConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+slowConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+
+chain.getConfigurator().apply(slowConfig);
+
