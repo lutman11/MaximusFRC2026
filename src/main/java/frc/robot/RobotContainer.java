@@ -37,8 +37,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.LinearServo;
-import frc.robot.subsystems.ChainMotor;
+//import frc.robot.subsystems.LinearServo;
+import frc.robot.subsystems.ChainSubsystem;
 
 
 public class RobotContainer {
@@ -62,9 +62,9 @@ public class RobotContainer {
 
     private final ShooterSubsystem shooter = new ShooterSubsystem();
 
-    private final LinearServo linearServo;
+    //private final LinearServo linearServo;
 
-    private final ChainMotor battleBus = new ChainMotor();
+    private final ChainSubsystem battleBus = new ChainSubsystem();
     
 
     /* Path follower */
@@ -128,7 +128,7 @@ public class RobotContainer {
         FollowPathCommand.warmupCommand().schedule();
 
         //  Linear Servo Constants
-         linearServo = new LinearServo(3, 70, 0);
+         //linearServo = new LinearServo(3, 70, 0);
     }
 
     private void configureBindings() {
