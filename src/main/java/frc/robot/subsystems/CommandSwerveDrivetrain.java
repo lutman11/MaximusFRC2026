@@ -46,7 +46,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
     
 // Find the goal point and then move to it
-    // Static scoring location (CURRENTLY PLACEHOLDER COORDINATES)
+    // Static scoring/goal location (CURRENTLY PLACEHOLDER COORDINATES)
     private static final Pose2d goalPose =
         new Pose2d(
             8.0, // X meters
@@ -61,31 +61,42 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Pose2d getCurrentPose() {
         return getState().Pose;
     }
-    // Find the poseError (distance from goal)
-    public Pose2d getPoseError() {
-        Pose2d current = getCurrentPose();
-        Pose2d goal = getGoalPose();
-
-        double errorX = goal.getX() - current.getX();
-        double errorY = goal.getY() - current.getX();
-        double errorRot = goal.getRotation().minus(current.getRotation()).getRadians();
-
-        return new Pose2d(errorX, errorY, new Rotation2d(errorRot));
-    }
     
+    // PIDControllers have an inbuilt "errorFinder" function in a way that will subtract the current and goal position by itself.
     private final PIDController xController = new PIDController(1.0, 0, 0);
     private final PIDController yController = new PIDController(1.0, 0, 0);
-    private final PIDController thetaController = new PIDController(2.0, 0, 0);
+    private final PIDController rotController = new PIDController(2.0, 0, 0);
+    
+    // Find the poseError (distance from goal) and drive to it based on that error.
+    public void driveToGoal() {
+        Pose2d = currentPose = getCurrentPose();
+        Pose2d = goalPose = getGoalPose();
+        
+        double xError = xController.calculate(
+            currentPose.getX(),
+            goalPose.getX()
+        );
+        double yError = yController.calculate(
+            currentPose.getY(),
 
-    public void driveToGoal(Pose2d currentPose, Pose2d goalPose) {
-        // will finish later today, sorry
+
+            
+            goalPose.getY()
+        );
+        double rotError = rotController.calculate(
+            currentPose.getRotation().getRadians(),
+            goalPose.getRotation().getRadians()
+        );
+        drive(xError, yError, rotError, true);
     }
     
-    // Using an example position, below tests the capabilities of the above code
+    // Using an example position, below tests the capabilities of the above code (WIP)
+    /*
     drive.setCurrentPoseForTesting(2, 1, 45);
-    Pose2d error = drive.getPoseError();
+    Pose2d error = drive.driveToGoal();
     System.out.println("Robot's distance from goalPose:");
     System.out.println(error);
+    */
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
