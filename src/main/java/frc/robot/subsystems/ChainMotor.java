@@ -81,5 +81,21 @@ chain.getConfigurator().apply(slowConfig);
         stallDetected = false;
         stallTimer.stop();
         stallTimer.reset();
+
+     // Command to run chain forward with protection
+    public Command intakeDrop() {
+    return Commands.run(
+        () -> moveForward(),
+        this
+    ).finallyDo(interrupted -> stop());
+}
+
+// Command to run chain in reverse with protection
+public Command intakeLift() {
+    return Commands.run(
+        () -> moveReverse(),
+        this
+    ).finallyDo(interrupted -> stop());
+}
     }
 }
