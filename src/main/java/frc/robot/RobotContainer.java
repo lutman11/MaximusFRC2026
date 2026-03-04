@@ -117,6 +117,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("shooterStop", Commands.runOnce(()->{
             fuelIntake.set(SHOOTER_STOP);
         }));
+        NamedCommands.registerCommand("limelightAuto", Commands.runOnce(()->{
+            drivetrain.driveToGoal();
+        }, drivetrain
+        ));
         
 
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
@@ -227,6 +231,9 @@ public class RobotContainer {
 
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
+
+        joystick.leftTrigger(0.7)
+        .onTrue(drivetrain.driveToGoalCommand());
 
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
