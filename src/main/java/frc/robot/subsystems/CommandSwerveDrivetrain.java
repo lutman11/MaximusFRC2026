@@ -44,8 +44,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-    
-// Find the goal point and then move to it
+
+    // Find the goal point and then move to it
     // Static scoring/goal location (CURRENTLY PLACEHOLDER COORDINATES)
     private static final Pose2d goalPose =
         new Pose2d(
@@ -69,8 +69,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
     // Find the poseError (distance from goal) and drive to it based on that error.
     public void driveToGoal() {
-        Pose2d = currentPose = getCurrentPose();
-        Pose2d = goalPose = getGoalPose();
+        Pose2d currentPose = getCurrentPose();
+        Pose2d goalPose = getGoalPose();
         
         double xError = xController.calculate(
             currentPose.getX(),
@@ -78,16 +78,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         );
         double yError = yController.calculate(
             currentPose.getY(),
-
-
-            
             goalPose.getY()
         );
         double rotError = rotController.calculate(
             currentPose.getRotation().getRadians(),
             goalPose.getRotation().getRadians()
         );
-        drive(xError, yError, rotError, true);
+        
+        setControl(m_fieldCentric.withVelocityX(xError).withVelocityY(yError).withRotationalRate(rotError));
+    }
+    
+    public Command driveToGoalCommand() {
+    return run(this::driveToGoal)
+        .until(() ->
+            xController.atSetpoint() &&
+            yController.atSetpoint() &&
+            rotController.atSetpoint()
+        );
     }
     
     // Using an example position, below tests the capabilities of the above code (WIP)
@@ -97,7 +104,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     System.out.println("Robot's distance from goalPose:");
     System.out.println(error);
     */
-
+    
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
@@ -112,6 +119,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    // Swerve request to allow movement via the limelight
+    private final SwerveRequest.FieldCentric m_fieldCentric = new SwerveRequest.FieldCentric();
+
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
