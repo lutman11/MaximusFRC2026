@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Subsystem that handles shooting mechanism:
@@ -61,11 +62,11 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void stopDragger() {
-        dragger.set(0)
+        dragger.set(0);
      }
 
     /** Returns a command that runs the shooter while held */
-    public Runnable getShootCommand() {
+    public Command getShootCommand() {
         return Commands.run(() -> startShooter(), this)
                        .until(() -> false)
                        .finallyDo(interrupted -> stopShooter());
@@ -75,7 +76,7 @@ public class ShooterSubsystem extends SubsystemBase {
             dragger.set(DRAGGER_SPEED_R);
     }
 
-    public Runnable getRDCommand() {
+    public Command getRDCommand() {
         return Commands.run(() -> draggerReverse(), this)
                        .until(() -> false)
                        .finallyDo(interrupted -> stopDragger());
