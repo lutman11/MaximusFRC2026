@@ -67,18 +67,18 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /** Returns a command that runs the shooter while held */
     public Command getShootCommand() {
-        return Commands.run(() -> startShooter(), this)
-                       .until(() -> false)
-                       .finallyDo(interrupted -> stopShooter());
+    return Commands.run(this::startShooter, this)
+                   .finallyDo(interrupted -> stopShooter());
     }
+
 
     public void draggerReverse() {
             dragger.set(DRAGGER_SPEED_R);
     }
 
     public Command getRDCommand() {
-        return Commands.run(() -> draggerReverse(), this)
-                       .until(() -> false)
-                       .finallyDo(interrupted -> stopDragger());
+    return Commands.run(this::draggerReverse, this)
+                   .finallyDo(interrupted -> stopDragger());
     }
+
 }
