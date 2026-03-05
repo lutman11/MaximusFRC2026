@@ -62,6 +62,8 @@ public class RobotContainer {
 
     private final ShooterSubsystem shooter = new ShooterSubsystem();
 
+    private final ShooterSubsystem reverseDragger = new ShooterSubsystem();
+
     //private final LinearServo linearServo;
 
     private final ChainSubsystem battleBus = new ChainSubsystem();
@@ -177,12 +179,13 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        joystick.leftBumper().whileTrue(Commands.run(() ->{
-            fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED);
-    }, drivetrain)).whileFalse(Commands.run(()->{
-        fuelIntake.set(0);
-    }, drivetrain));
+        joystick.leftBumper().whileTrue(
+            Commands.parallel(
+            Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED), drivetrain),
+            shooter.getRDCommand())
+                ).whileFalse(
+            Commands.run(() -> fuelIntake.set(0), drivetrain)
+        );
 
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
