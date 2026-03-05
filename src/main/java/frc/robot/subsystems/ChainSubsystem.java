@@ -93,12 +93,15 @@ public class ChainSubsystem extends SubsystemBase {
             this
         ).finallyDo(interrupted -> stop());
 
-        /*
      public Command runForTime(double speed, double seconds) {
         return Commands.sequence(
             Commands.run(() -> runWithProtection(speed), this),
             new WaitCommand(seconds),
             Commands.runOnce(this::stop, this));
-         */
+
+     Commands.sequence(
+        Commands.run(() -> runWithProtection(speed), this),
+        new WaitCommand(seconds),
+        Commands.runOnce(() -> stop(), this));
     }
 }
