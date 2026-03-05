@@ -60,6 +60,10 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel.set(0);
     }
 
+    public void stopDragger() {
+        dragger.set(0)
+     }
+
     /** Returns a command that runs the shooter while held */
     public Runnable getShootCommand() {
         return Commands.run(() -> startShooter(), this)
@@ -67,4 +71,13 @@ public class ShooterSubsystem extends SubsystemBase {
                        .finallyDo(interrupted -> stopShooter());
     }
 
+    public void draggerReverse() {
+            dragger.set(DRAGGER_SPEED_R);
+    }
+
+    public Runnable getRDCommand() {
+        return Commands.run(() -> draggerReverse(), this)
+                       .until(() -> false)
+                       .finallyDo(interrupted -> stopDragger());
+    }
 }
