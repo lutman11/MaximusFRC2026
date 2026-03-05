@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-
 public class ChainSubsystem extends SubsystemBase {
 
     private final TalonFX chainMotor;
@@ -37,26 +36,23 @@ public class ChainSubsystem extends SubsystemBase {
         chainMotor.getConfigurator().apply(config);
     }
 
+    // Stall-protected motor control
     private void runWithProtection(double speed) {
-
         double current = chainMotor.getStatorCurrent().getValueAsDouble();
         double velocity = Math.abs(chainMotor.getVelocity().getValueAsDouble());
 
         boolean possibleStall = current > CURRENT_LIMIT && velocity < VELOCITY_THRESHOLD;
 
         if (possibleStall) {
-
             if (!stallDetected) {
                 stallTimer.reset();
                 stallTimer.start();
                 stallDetected = true;
             }
-
             if (stallTimer.hasElapsed(STALL_DELAY)) {
                 chainMotor.set(0);
                 return;
             }
-
         } else {
             stallDetected = false;
             stallTimer.stop();
@@ -67,11 +63,11 @@ public class ChainSubsystem extends SubsystemBase {
     }
 
     public void moveForward() {
-        runWithProtection(CHAIN_FORWARD);
+        runWithProtection(CHAIN_FORWARD); 
     }
 
     public void moveReverse() {
-        runWithProtection(CHAIN_REVERSE);
+        runWithProtection(CHAIN_REVERSE); 
     }
 
     public void stop() {
@@ -81,28 +77,25 @@ public class ChainSubsystem extends SubsystemBase {
         stallTimer.reset();
     }
 
+    // Instant control commands
     public Command intakeDrop() {
         return Commands.run(
-            () -> moveForward(),
-            this
-        ).finallyDo(interrupted -> stop());
+            () -> moveForward(), this
+            ).finallyDo(interrupted -> stop());
     }
 
     public Command intakeLift() {
         return Commands.run(
-            () -> moveReverse(),
-            this
-        ).finallyDo(interrupted -> stop());
+            () -> moveReverse(), this
+            ).finallyDo(interrupted -> stop());
     }
-        
-     public Command runForDefaultTime(double speed) {
-    return Commands.sequence(
-        // Start the motor safely
-        Commands.run(() -> runWithProtection(speed), this),
-        // Wait for the default time
-        new WaitCommand(DEFAULT_CHAIN_TIME),
-        // Stop the motor automatically
-        Commands.runOnce(this::stop, this)
-         }
 
+    // Timed chain command — applies protection first, then stops after default time
+    public Command runForDefaultTime(double speed) {
+        return Commands.sequence(
+            Commands.run(() -> runWithProtection(speed), this),
+            new WaitCommand(DEFAULT_CHAIN_TIME),
+            Commands.runOnce(this::stop, this)
+        );
+    }
 }
