@@ -93,7 +93,8 @@ public class ChainSubsystem extends SubsystemBase {
             () -> moveReverse(),
             this
         ).finallyDo(interrupted -> stop());
-
+    }
+        
      public Command runForDefaultTime(double speed) {
     return Commands.sequence(
         // Start the motor safely
@@ -102,10 +103,6 @@ public class ChainSubsystem extends SubsystemBase {
         new WaitCommand(DEFAULT_CHAIN_TIME),
         // Stop the motor automatically
         Commands.runOnce(this::stop, this)
+         }
 
-     Commands.sequence(
-        Commands.run(() -> runWithProtection(speed), this),
-        new WaitCommand(seconds),
-        Commands.runOnce(() -> stop(), this));
-    }
 }
