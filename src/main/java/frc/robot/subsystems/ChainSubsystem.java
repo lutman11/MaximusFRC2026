@@ -22,6 +22,7 @@ public class ChainSubsystem extends SubsystemBase {
     private static final double CURRENT_LIMIT = 40.0;
     private static final double VELOCITY_THRESHOLD = 1.0;
     private static final double STALL_DELAY = 0.25;
+    private static final double DEFAULT_CHAIN_TIME = 1.0;
 
     private final Timer stallTimer = new Timer();
     private boolean stallDetected = false;
@@ -93,11 +94,14 @@ public class ChainSubsystem extends SubsystemBase {
             this
         ).finallyDo(interrupted -> stop());
 
-     public Command runForTime(double speed, double seconds) {
-        return Commands.sequence(
-            Commands.run(() -> runWithProtection(speed), this),
-            new WaitCommand(seconds),
-            Commands.runOnce(this::stop, this));
+     public Command runForDefaultTime(double speed) {
+    return Commands.sequence(
+        // Start the motor safely
+        Commands.run(() -> runWithProtection(speed), this),
+        // Wait for the default time
+        new WaitCommand(DEFAULT_CHAIN_TIME),
+        // Stop the motor automatically
+        Commands.runOnce(this::stop, this)
 
      Commands.sequence(
         Commands.run(() -> runWithProtection(speed), this),
