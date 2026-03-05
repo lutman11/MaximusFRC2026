@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+
 
 public class ChainSubsystem extends SubsystemBase {
 
@@ -90,5 +92,13 @@ public class ChainSubsystem extends SubsystemBase {
             () -> moveReverse(),
             this
         ).finallyDo(interrupted -> stop());
+
+        /*
+     public Command runForTime(double speed, double seconds) {
+        return Commands.sequence(
+            Commands.run(() -> runWithProtection(speed), this),
+            new WaitCommand(seconds),
+            Commands.runOnce(this::stop, this));
+         */
     }
 }
