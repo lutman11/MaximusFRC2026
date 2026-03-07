@@ -25,11 +25,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
     private static final int CAN_ID_FLYWHEEL1 = 33;
-    private static final int CAN_ID_FLYWHEEL2 = 34;
+    private static final int CAN_ID_FLYWHEEL2 = 35;
 
-    private static final double DRAGGER_SPEED = -0.1;
+    private static final double DRAGGER_SPEED = 0.2;
     private static final double PULLUP_SPEED = -0.3;
-    private static final double FLYWHEEL_SPEED = -0.4;
+    private static final double FLYWHEEL_SPEED = -0.8;
 
     private static final double DRAGGER_SPEED_R = -0.2;
     private static final double PULLUP_SPEED_R = 0.3;
@@ -55,7 +55,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public void startShooter() {
         dragger.set(DRAGGER_SPEED);
         pullUp.set(PULLUP_SPEED);
-        flyWheel1.set(FLYWHEEL_SPEED);
+        flyWheel1.set(-FLYWHEEL_SPEED);
         flyWheel2.set(FLYWHEEL_SPEED);
     }
 
