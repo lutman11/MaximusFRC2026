@@ -13,19 +13,21 @@ import edu.wpi.first.wpilibj2.command.Command;
  * Subsystem that handles shooting mechanism:
  * - Dragger motor
  * - Pull-up motor
- * - Flywheel motor
+ * - Flywheel motors 1 & 2
  */
 public class ShooterSubsystem extends SubsystemBase {
 
     private final TalonFX dragger;
     private final TalonFX pullUp;
-    private final TalonFX flyWheel;
+    private final TalonFX flyWheel1;
+    private final TalonFX flyWheel2;
 
-    private static final int CAN_ID_DRAGGER = 31;
+    private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
-    private static final int CAN_ID_FLYWHEEL = 33;
+    private static final int CAN_ID_FLYWHEEL1 = 33;
+    private static final int CAN_ID_FLYWHEEL2 = 34;
 
-    private static final double DRAGGER_SPEED = 0.2;
+    private static final double DRAGGER_SPEED = -0.1;
     private static final double PULLUP_SPEED = -0.3;
     private static final double FLYWHEEL_SPEED = -0.4;
 
@@ -36,7 +38,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public ShooterSubsystem() {
         dragger = new TalonFX(CAN_ID_DRAGGER);
         pullUp = new TalonFX(CAN_ID_PULLUP);
-        flyWheel = new TalonFX(CAN_ID_FLYWHEEL);
+        flyWheel1 = new TalonFX(CAN_ID_FLYWHEEL1);
+        flyWheel2 = new TalonFX(CAN_ID_FLYWHEEL2);
 
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -44,43 +47,44 @@ public class ShooterSubsystem extends SubsystemBase {
 
         dragger.getConfigurator().apply(config);
         pullUp.getConfigurator().apply(config);
-        flyWheel.getConfigurator().apply(config);
+        flyWheel1.getConfigurator().apply(config);
+        flyWheel2.getConfigurator().apply(config);
     }
 
     /** Starts the shooter motors */
     public void startShooter() {
         dragger.set(DRAGGER_SPEED);
         pullUp.set(PULLUP_SPEED);
-        flyWheel.set(FLYWHEEL_SPEED);
+        flyWheel1.set(FLYWHEEL_SPEED);
+        flyWheel2.set(FLYWHEEL_SPEED);
     }
 
     /** Stops the shooter motors */
     public void stopShooter() {
         dragger.set(0);
         pullUp.set(0);
-        flyWheel.set(0);
+        flyWheel1.set(0);
+        flyWheel2.set(0);
     }
 
-    public void stopDragger() {
-        dragger.set(0);
-     }
+    public void draggerReverse(){
+        dragger.set(DRAGGER_SPEED_R);
+    }
 
-        public void draggerReverse() {
-            dragger.set(DRAGGER_SPEED_R);
+    public void stopDragger(){
+        dragger.set(0);
     }
 
     /** Returns a command that runs the shooter while held */
     public Command getShootCommand() {
-    return Commands.run(() -> startShooter(), this)
-                    .until(() -> false)
-                   .finallyDo(interrupted -> stopShooter());
+        return Commands.run(() -> startShooter(), this)
+                       .until(() -> false)
+                       .finallyDo(interrupted -> stopShooter());
     }
 
-
-  public Command getRDCommand() {
-    return Commands.run(() -> draggerReverse(), this)
-                    .until(() -> false)
-                   .finallyDo(interrupted -> stopDragger());
+    public Command getRDCommand(){
+        return Commands.run(() -> draggerReverse(), this)
+                      .until(() -> false)
+                      .finallyDo(interupted -> stopDragger());
     }
-
 }
