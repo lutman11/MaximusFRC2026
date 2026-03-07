@@ -90,8 +90,8 @@ public class RobotContainer {
      // slowMode variables
      private boolean slowMode = false;
      private boolean fastMode = false;
- 
-    public RobotContainer() {
+
+     public RobotContainer() {
 
         fuelIntake = new TalonFX(CAN_IDFI);
 
@@ -119,10 +119,14 @@ public class RobotContainer {
         NamedCommands.registerCommand("shooterStop", Commands.runOnce(()->{
             fuelIntake.set(SHOOTER_STOP);
         }));
-        NamedCommands.registerCommand("limelightAuto", Commands.runOnce(()->{
-            drivetrain.driveToGoal();
-        }, drivetrain
-        ));
+
+        NamedCommands.registerCommand("intakeLift", Commands.runOnce(()->{
+            battleBus.intakeLift();
+        }));
+
+        NamedCommands.registerCommand("intakeDrop", Commands.runOnce(()->{
+            battleBus.intakeDrop();
+        }));
         
 
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
@@ -157,18 +161,22 @@ public class RobotContainer {
             // Drivetrain will execute this command periodically
              drivetrain.applyRequest(() -> {
                 double speedFactor;
+                double rotationFactor;
                 if(slowMode){
                     speedFactor = 0.2;
+                    rotationFactor = 0.3;
                 }
                 else if(fastMode){
                     speedFactor = 1.0;
+                    rotationFactor = 1.0;
                 }
                 else{
                     speedFactor = 0.75;
+                    rotationFactor = 0.75;
                 }
                 return drive.withVelocityX(-joystick.getLeftY() * MaxSpeed* 0.5 * speedFactor) // Drive forward with negative Y (forward)
                     .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.5 * speedFactor) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * 0.5 * speedFactor); // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * 0.5 * rotationFactor); // Drive counterclockwise with negative X (left)
             })
         );
 
@@ -182,7 +190,7 @@ public class RobotContainer {
         joystick.leftBumper().whileTrue(
             Commands.parallel(
             Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED), drivetrain),
-            shooter.getRDCommand())
+            reverseDragger.getRDCommand())
                 ).whileFalse(
             Commands.run(() -> fuelIntake.set(0), drivetrain)
         );
@@ -228,15 +236,18 @@ public class RobotContainer {
         Math.abs(joystick.getLeftX()) > 0.10 || Math.abs(joystick.getLeftY()) > 0.10);
 
         Trigger intakeTrigger = joystick.rightBumper().or(leftJoystickMoved.and(joystick.rightBumper()));
+        Trigger reverseIntakeTrigger = joystick.leftBumper().or(leftJoystickMoved.and(joystick.leftBumper()));
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
+            .whileFalse(Commands.run(() -> fuelIntake.set(0)));
+        reverseIntakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(0)));
 
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
 
-        joystick.leftTrigger(0.7)
-        .onTrue(drivetrain.driveToGoalCommand());
+        //joystick.leftTrigger(0.7)
+        //.onTrue(drivetrain.driveToGoalCommand()); 
 
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
