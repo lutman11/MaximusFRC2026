@@ -39,6 +39,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 //import frc.robot.subsystems.LinearServo;
 import frc.robot.subsystems.ChainSubsystem;
+import frc.robot.commands.AutoAlignToTag;
 
 
 public class RobotContainer {
@@ -246,9 +247,11 @@ public class RobotContainer {
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
 
-        //joystick.leftTrigger(0.7)
-        //.onTrue(drivetrain.driveToGoalCommand()); 
-
+        /* \
+        joystick.leftTrigger(0.7).a().whileTrue(
+        new AutoAlignToTag(drivetrain)
+        );
+        */
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
 
