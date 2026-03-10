@@ -72,11 +72,19 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel2.set(0);
     }
 
-    public void draggerReverse(){
+    public void feederReverse(){
         dragger.set(DRAGGER_SPEED_R);
+        pullUp.set(PULLUP_SPEED_R);
+    public void flywheelReverse(){
+        flyWheel1.set(-FLYWHEEL_SPEED_R);
+        flyWheel2.set(FLYWHEEL_SPEED_R);
+        
     }
 
-    public void stopDragger(){
+    public void draggerReverse() {
+        dragger.set(DRAGGER_SPEED_R);
+    }
+    public void stopDragger() {
         dragger.set(0);
     }
 
@@ -87,6 +95,14 @@ public class ShooterSubsystem extends SubsystemBase {
             new WaitCommand(1.5),
             Commands.run(() -> startFeeder(), this)
         ).finallyDo(interrupted -> stopShooter());
+
+    public Command reverseShootCommand() {
+        return Commands.sequence(
+            Commands.runOnce(() -> flywheelReverse()),
+            new WaitCommand(1.5),
+            Commands.run(() -> reverseFeeder(), this)
+        ).finallyDo(interrupted -> stopShooter());
+
     }
 
     public Command getRDCommand(){
