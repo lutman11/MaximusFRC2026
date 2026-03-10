@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Subsystem that handles shooting mechanism:
@@ -51,12 +52,16 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel2.getConfigurator().apply(config);
     }
 
-    /** Starts the shooter motors */
-    public void startShooter() {
-        dragger.set(DRAGGER_SPEED);
-        pullUp.set(PULLUP_SPEED);
+    /** Starts flywheel motors immediately */
+    public void startFlywheels() {
         flyWheel1.set(-FLYWHEEL_SPEED);
         flyWheel2.set(FLYWHEEL_SPEED);
+    }
+
+    /** Starts dragger + pullUp feeder */
+    public void startFeeder() {
+        dragger.set(DRAGGER_SPEED);
+        pullUp.set(PULLUP_SPEED);
     }
 
     /** Stops the shooter motors */
@@ -77,14 +82,16 @@ public class ShooterSubsystem extends SubsystemBase {
 
     /** Returns a command that runs the shooter while held */
     public Command getShootCommand() {
-        return Commands.run(() -> startShooter(), this)
-                       .until(() -> false)
-                       .finallyDo(interrupted -> stopShooter());
+        return Commands.sequence(
+            Commands.runOnce(() -> startFlywheels()),
+            new WaitCommand(1.5),
+            Commands.run(() -> startFeeder(), this)
+        ).finallyDo(interrupted -> stopShooter());
     }
 
     public Command getRDCommand(){
         return Commands.run(() -> draggerReverse(), this)
                       .until(() -> false)
-                      .finallyDo(interupted -> stopDragger());
+                      .finallyDo(interrupted -> stopDragger());
     }
 }
