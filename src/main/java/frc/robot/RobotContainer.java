@@ -187,7 +187,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
+/*
         joystick.leftBumper().whileTrue(
             Commands.parallel(
             Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED), drivetrain),
@@ -195,7 +195,7 @@ public class RobotContainer {
                 ).whileFalse(
             Commands.run(() -> fuelIntake.set(0), drivetrain)
         );
-
+*/
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
@@ -247,11 +247,9 @@ public class RobotContainer {
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
 
-        /* \
-        joystick.leftTrigger(0.7).a().whileTrue(
-        new AutoAlignToTag(drivetrain)
-        );
-        */
+        joystick.leftTrigger(0.7)
+        .whileTrue(new AutoAlignToTag(drivetrain));
+    
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
 
