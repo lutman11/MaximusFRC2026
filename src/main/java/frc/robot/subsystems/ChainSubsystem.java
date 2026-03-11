@@ -15,8 +15,8 @@ public class ChainSubsystem extends SubsystemBase {
     private final TalonFX chainMotor;
     private static final int CAN_ID_CHAIN = 34;
 
-    private static final double CHAIN_FORWARD = 0.05;
-    private static final double CHAIN_REVERSE = -0.05;
+    private static final double CHAIN_FORWARD = 0.07;
+    private static final double CHAIN_REVERSE = -0.07;
 
     private static final double CURRENT_LIMIT = 40.0;
     private static final double VELOCITY_THRESHOLD = 1.0;
