@@ -28,11 +28,11 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final int CAN_ID_FLYWHEEL1 = 33;
     private static final int CAN_ID_FLYWHEEL2 = 35;
 
-    private static final double DRAGGER_SPEED = 0.2;
+    private static final double DRAGGER_SPEED = 0.15;
     private static final double PULLUP_SPEED = -0.3;
     private static final double FLYWHEEL_SPEED = -0.8;
 
-    private static final double DRAGGER_SPEED_R = -0.2;
+    private static final double DRAGGER_SPEED_R = -0.15;
     private static final double PULLUP_SPEED_R = 0.3;
     private static final double FLYWHEEL_SPEED_R = 0.4; 
 
@@ -74,13 +74,12 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void feederReverse(){
         dragger.set(DRAGGER_SPEED_R);
-        pullUp.set(PULLUP_SPEED_R);
+        pullUp.set(PULLUP_SPEED_R);}
     public void flywheelReverse(){
         flyWheel1.set(-FLYWHEEL_SPEED_R);
         flyWheel2.set(FLYWHEEL_SPEED_R);
         
     }
-
     public void draggerReverse() {
         dragger.set(DRAGGER_SPEED_R);
     }
@@ -95,12 +94,11 @@ public class ShooterSubsystem extends SubsystemBase {
             new WaitCommand(1.5),
             Commands.run(() -> startFeeder(), this)
         ).finallyDo(interrupted -> stopShooter());
+    }
 
     public Command reverseShootCommand() {
         return Commands.sequence(
-            Commands.runOnce(() -> flywheelReverse()),
-            new WaitCommand(1.5),
-            Commands.run(() -> reverseFeeder(), this)
+            Commands.runOnce(() -> flywheelReverse())
         ).finallyDo(interrupted -> stopShooter());
 
     }
