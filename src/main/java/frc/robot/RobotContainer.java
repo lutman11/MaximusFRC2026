@@ -241,9 +241,19 @@ public class RobotContainer {
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(0)));
-        reverseIntakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED)))
-            .whileFalse(Commands.run(() -> fuelIntake.set(0)));
-
+        reverseIntakeTrigger.whileTrue(
+            Commands.parallel(
+                Commands.run(() -> reverseDragger.reverseShootCommand()),
+                Commands.run(() -> reverseDragger.draggerReverse()),
+                Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED))
+            )
+            ).whileFalse(
+                Commands.parallel(
+                    Commands.run(() -> reverseDragger.stopDragger()),
+                    Commands.run(() -> fuelIntake.set(0))
+                )
+            );
+    
         joystick.rightTrigger()
         .whileTrue(shooter.getShootCommand());
 
