@@ -13,7 +13,7 @@ public class AutoAlignToTag extends Command {
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
     //0.1 - 0.4
-    double kP_turn = -0.02;
+    double kP_turn = -0.1;
     //0.3 - 0.7
     double kP_drive = 0.05;
     //This needs to be replaced with the value given from the limelight exaclty where we want it placed when shooting.
@@ -39,6 +39,7 @@ public class AutoAlignToTag extends Command {
         }
 
         double tx = LimelightHelpers.getTX("limelight");
+        double ty = LimelightHelpers.getTY("limelight");
 
         double turn = tx * kP_turn;
 
@@ -52,6 +53,7 @@ public class AutoAlignToTag extends Command {
         );
 
         System.out.println("tx: " + tx);
+        System.out.println("ty: " + ty);
     }
 
     @Override
@@ -72,4 +74,3 @@ public class AutoAlignToTag extends Command {
     }
     
 }
-
