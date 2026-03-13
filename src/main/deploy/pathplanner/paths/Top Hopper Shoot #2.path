@@ -1,0 +1,68 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.22311320754717,
+        "y": 4.807201257861635
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.7611713836477985,
+        "y": 5.241564465408805
+      },
+      "isLocked": false,
+      "linkedName": "Hopper"
+    },
+    {
+      "anchor": {
+        "x": 0.5686713836477988,
+        "y": 5.972397798742138
+      },
+      "prevControl": {
+        "x": 1.671816037735849,
+        "y": 6.199921383647799
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Depo"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.6979166666666662,
+      "maxWaypointRelativePos": 1.0,
+      "constraints": {
+        "maxVelocity": 0.7,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "tops",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -27.25532837494305
+  },
+  "useDefaultConstraints": true
+}
