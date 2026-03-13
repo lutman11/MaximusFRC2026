@@ -65,6 +65,8 @@ public class RobotContainer {
 
     private final ShooterSubsystem reverseDragger = new ShooterSubsystem();
 
+    private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
+
     //private final LinearServo linearServo;
 
     private final ChainSubsystem battleBus = new ChainSubsystem();
@@ -80,13 +82,13 @@ public class RobotContainer {
      private static final double REVERSE_INTAKE_MOTOR_SPEED = .125;
      private static final double INTAKE_AUTO = -0.25;
      private static final double INTAKE_STOP = 0;
-     private static final double SHOOTER_AUTO = 0.25;
-     private static final double SHOOTER_STOP = 0;
 
-     // endgame variables
+     // endgame variables (OLD CLIMBER CODE)
+     /*
      private final SparkMax endGame;
      private static final int CAN_IDblank = 100000;
      private static final double ENDGAME_MOTOR_SPEED = 0.55; // Change this value to adjust the motor speed
+     */
  
      // slowMode variables
      private boolean slowMode = false;
@@ -101,9 +103,11 @@ public class RobotContainer {
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         fuelIntake.getConfigurator().apply(config);
 
+        /*
         endGame = new SparkMax(CAN_IDblank, MotorType.kBrushless);
         SparkMaxConfig neoConfig2 = new SparkMaxConfig();
         neoConfig2.inverted(false).idleMode(IdleMode.kBrake);
+        */
 
         NamedCommands.registerCommand("scooperOn", Commands.runOnce(()->{
             fuelIntake.set(INTAKE_AUTO);
@@ -112,13 +116,13 @@ public class RobotContainer {
         NamedCommands.registerCommand("scooperStop", Commands.runOnce(()->{
             fuelIntake.set(INTAKE_STOP);
         }));
-         
+         // to-do: take a look at these two shooter commands later
          NamedCommands.registerCommand("shooterOn", Commands.runOnce(()->{
-            fuelIntake.set(SHOOTER_AUTO);
+            shooter.startShooterCommand();
         }));
 
         NamedCommands.registerCommand("shooterStop", Commands.runOnce(()->{
-            fuelIntake.set(SHOOTER_STOP);
+            shooter.stopShooterCommand();
         }));
 
         NamedCommands.registerCommand("intakeLift", Commands.runOnce(()->{
@@ -128,7 +132,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("intakeDrop", Commands.runOnce(()->{
             battleBus.intakeDrop();
         }));
-        
+
+        NamedCommands.registerCommand("autoAlignToTag", Commands.runOnce(()->{
+            new AutoAlignToTag(drivetrain);
+        }));
 
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -187,15 +194,7 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-/*
-        joystick.leftBumper().whileTrue(
-            Commands.parallel(
-            Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED), drivetrain),
-            reverseDragger.getRDCommand())
-                ).whileFalse(
-            Commands.run(() -> fuelIntake.set(0), drivetrain)
-        );
-*/
+
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
@@ -254,11 +253,11 @@ public class RobotContainer {
                 )
             );
     
-        joystick.rightTrigger()
+        joystick.rightTrigger(0.2)
         .whileTrue(shooter.getShootCommand());
 
-        joystick.leftTrigger(0.7)
-        .whileTrue(new AutoAlignToTag(drivetrain));
+        joystick.leftTrigger(0.2)
+        .whileTrue(autoAlign);
     
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
