@@ -16,10 +16,10 @@ public class AutoAlignToTag extends Command {
 
     private void stopAutoAlign() {
         drivetrain.setControl(
-                driveRequest
-                        .withVelocityX(0)
-                        .withVelocityY(0)
-                        .withRotationalRate(0));
+            driveRequest
+                .withVelocityX(0)
+                .withVelocityY(0)
+                .withRotationalRate(0));
     }
 
     private boolean isAllowedTag(int tid) {
@@ -61,8 +61,7 @@ public class AutoAlignToTag extends Command {
         }
 
         double tx = LimelightHelpers.getTX("limelight");
-        double ty = LimelightHelpers.getTY("limelight"); // 90 inches away from the limelight to the hub (ideal shooting
-                                                         // distance according to Marc)
+        double ty = LimelightHelpers.getTY("limelight");
         double drive = -(ty - targetTY) * kP_drive;
         double turn = tx * kP_turn;
 
@@ -75,10 +74,10 @@ public class AutoAlignToTag extends Command {
             drive = 0;
 
         drivetrain.setControl(
-                driveRequest
-                        .withVelocityX(drive)
-                        .withVelocityY(0)
-                        .withRotationalRate(turn));
+            driveRequest
+                .withVelocityX(drive)
+                .withVelocityY(0)
+                .withRotationalRate(turn));
 
         System.out.println("tx: " + tx);
         System.out.println("ty: " + ty);
