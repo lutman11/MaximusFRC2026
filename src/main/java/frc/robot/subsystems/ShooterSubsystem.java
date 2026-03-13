@@ -30,7 +30,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private static final double DRAGGER_SPEED = 0.15;
     private static final double PULLUP_SPEED = -0.3;
-    private static final double FLYWHEEL_SPEED = -0.8;
+    private static final double FLYWHEEL_SPEED = -0.65;
 
     private static final double DRAGGER_SPEED_R = -0.15;
     private static final double PULLUP_SPEED_R = 0.3;
@@ -91,7 +91,7 @@ public class ShooterSubsystem extends SubsystemBase {
     public Command getShootCommand() {
         return Commands.sequence(
             Commands.runOnce(() -> startFlywheels()),
-            new WaitCommand(1.5),
+            new WaitCommand(.6),
             Commands.run(() -> startFeeder(), this)
         ).finallyDo(interrupted -> stopShooter());
     }
@@ -100,12 +100,24 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.sequence(
             Commands.runOnce(() -> flywheelReverse())
         ).finallyDo(interrupted -> stopShooter());
+    }
 
+    // PathPlanner variations
+    public Command startShooterCommand() {
+        return Commands.sequence(
+            Commands.runOnce(() -> startFlywheels()),
+            new WaitCommand(.6),
+            Commands.run(() -> startFeeder(), this)
+        );
+    }
+
+    public Command stopShooterCommand() {
+        return Commands.runOnce(() -> stopShooter(), this);
     }
 
     public Command getRDCommand(){
         return Commands.run(() -> draggerReverse(), this)
-                      .until(() -> false)
-                      .finallyDo(interrupted -> stopDragger());
+            .until(() -> false
+        ).finallyDo(interrupted -> stopDragger());
     }
 }
