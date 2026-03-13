@@ -12,6 +12,11 @@ public class AutoAlignToTag extends Command {
 
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
+    @Override
+    public void initialize() {
+        System.out.println("AutoAlign started");
+    }
+
     int[] allowedTags = { 9, 10, 11, 8 };
 
     private void stopAutoAlign() {
@@ -46,7 +51,8 @@ public class AutoAlignToTag extends Command {
 
     @Override
     public void execute() {
-        System.out.println("AutoAlign started");
+
+        System.out.println("AutoAlign Running");
 
         int tid = (int) LimelightHelpers.getFiducialID("limelight");
 
@@ -92,7 +98,7 @@ public class AutoAlignToTag extends Command {
 
     @Override
     public boolean isFinished() {
-        return !LimelightHelpers.getTV("limelight");
+        return false;
     }
 
 }
