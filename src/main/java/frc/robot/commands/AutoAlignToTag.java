@@ -58,7 +58,7 @@ public class AutoAlignToTag extends Command {
     }
 
     // 0.1 - 0.4, make negative
-    double kP_turn = -0.09;
+    double kP_turn = -0.06;
     // 0.03- 0.08
     double kP_drive = 0.04;
     // This needs to be replaced with the value given from the limelight exaclty
