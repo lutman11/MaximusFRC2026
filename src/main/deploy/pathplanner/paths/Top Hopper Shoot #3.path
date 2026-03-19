@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5686713836477988,
-        "y": 5.972397798742138
+        "x": 0.878930817610063,
+        "y": 5.98618710691824
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.3610062893081762,
-        "y": 6.048238993710692
+        "x": 3.671265723270441,
+        "y": 6.0620283018867935
       },
       "isLocked": false,
-      "linkedName": "Depo"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.1472720125786164,
-        "y": 4.848569182389938
+        "x": 2.78875,
+        "y": 5.1105660377358495
       },
       "prevControl": {
-        "x": 2.719803459119497,
-        "y": 5.241564465408805
+        "x": 2.3612814465408802,
+        "y": 5.5035613207547165
       },
       "nextControl": null,
       "isLocked": false,
@@ -45,7 +45,7 @@
     "rotation": -29.228051943145093
   },
   "reversed": false,
-  "folder": "tops",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

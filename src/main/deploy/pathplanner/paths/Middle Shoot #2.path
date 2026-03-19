@@ -12,7 +12,7 @@
         "y": 3.297272012578617
       },
       "isLocked": false,
-      "linkedName": "Center"
+      "linkedName": null
     },
     {
       "anchor": {
@@ -25,7 +25,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Outpost"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 179.71494872241615
+    "rotation": 179.71494872241618
   },
   "reversed": false,
-  "folder": "middle",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
