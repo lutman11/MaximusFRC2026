@@ -16,6 +16,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -32,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.LimelightHelpers;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -44,67 +46,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
-
-    // Find the goal point and then move to it
-    // Static scoring/goal location (CURRENTLY PLACEHOLDER COORDINATES)
-    private static final Pose2d goalPose =
-        new Pose2d(
-            8.0, // X meters
-            4.0, // Y meters
-            Rotation2d.fromDegrees(180)
-        );
-    // This command returns the point the Robot should travel to in order to score
-    public Pose2d getGoalPose() {
-        return goalPose;
-    }
-    // This command returns the Robot's current position
-    public Pose2d getCurrentPose() {
-        return getState().Pose;
-    }
-    
-    // PIDControllers have an inbuilt "errorFinder" function in a way that will subtract the current and goal position by itself.
-    private final PIDController xController = new PIDController(1.0, 0, 0);
-    private final PIDController yController = new PIDController(1.0, 0, 0);
-    private final PIDController rotController = new PIDController(2.0, 0, 0);
-    
-    // Find the poseError (distance from goal) and drive to it based on that error.
-    public void driveToGoal() {
-        Pose2d currentPose = getCurrentPose();
-        Pose2d goalPose = getGoalPose();
-        
-        double xError = xController.calculate(
-            currentPose.getX(),
-            goalPose.getX()
-        );
-        double yError = yController.calculate(
-            currentPose.getY(),
-            goalPose.getY()
-        );
-        double rotError = rotController.calculate(
-            currentPose.getRotation().getRadians(),
-            goalPose.getRotation().getRadians()
-        );
-        
-        setControl(m_fieldCentric.withVelocityX(xError).withVelocityY(yError).withRotationalRate(rotError));
-    }
-    
-    public Command driveToGoalCommand() {
-    return run(this::driveToGoal)
-        .until(() ->
-            xController.atSetpoint() &&
-            yController.atSetpoint() &&
-            rotController.atSetpoint()
-        );
-    }
-    
-    // Using an example position, below tests the capabilities of the above code (WIP)
-    /*
-    drive.setCurrentPoseForTesting(2, 1, 45);
-    Pose2d error = drive.driveToGoal();
-    System.out.println("Robot's distance from goalPose:");
-    System.out.println(error);
-    */
-    
+     
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
