@@ -78,7 +78,7 @@ public class RobotContainer {
      // Fuel Intake game variables
      private final TalonFX fuelIntake;
      private static final int CAN_IDFI = 30;
-     private static final double INTAKE_MOTOR_SPEED = -0.3; // Change this value to adjust the motor speed
+     private static final double INTAKE_MOTOR_SPEED = -0.4; // Change this value to adjust the motor speed
      private static final double REVERSE_INTAKE_MOTOR_SPEED = .125;
      private static final double INTAKE_AUTO = -0.25;
      private static final double INTAKE_STOP = 0;
@@ -116,26 +116,16 @@ public class RobotContainer {
         NamedCommands.registerCommand("scooperStop", Commands.runOnce(()->{
             fuelIntake.set(INTAKE_STOP);
         }));
-         // to-do: take a look at these two shooter commands later
-         NamedCommands.registerCommand("shooterOn", Commands.runOnce(()->{
-            shooter.startShooterCommand();
-        }));
 
-        NamedCommands.registerCommand("shooterStop", Commands.runOnce(()->{
-            shooter.stopShooterCommand();
-        }));
+        NamedCommands.registerCommand("shooterOn", shooter.getShootCommand());
 
-        NamedCommands.registerCommand("intakeLift", Commands.runOnce(()->{
-            battleBus.intakeLift();
-        }));
+        NamedCommands.registerCommand("shooterStop", shooter.stopShooterCommand());
 
-        NamedCommands.registerCommand("intakeDrop", Commands.runOnce(()->{
-            battleBus.intakeDrop();
-        }));
+        NamedCommands.registerCommand("intakeLift", battleBus.intakeLift());
 
-        NamedCommands.registerCommand("autoAlignToTag", Commands.runOnce(()->{
-            new AutoAlignToTag(drivetrain);
-        }));
+        NamedCommands.registerCommand("intakeDrop", battleBus.intakeDrop());
+
+        NamedCommands.registerCommand("autoAlignToTag", new AutoAlignToTag(drivetrain).withTimeout(2.0));
 
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
@@ -258,12 +248,20 @@ public class RobotContainer {
 
         joystick.leftTrigger(0.2)
         .whileTrue(autoAlign);
+    /*
+        joystick.x()
+        .whileTrue(shooter.getShootShortCommand());
+
+        joystick.y()
+        .whileTrue(shooter.getShootLongCommand());
     
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
-
+    */
+    /* 
         joystick.leftStick()
-        .onTrue(battleBus.intakeLift());
+        .onTrue(battleBus.intakeLift()); 
+    */
         
     }
 
