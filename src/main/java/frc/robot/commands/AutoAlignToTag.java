@@ -14,11 +14,11 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 public class AutoAlignToTag extends Command {
 
+    // assists with debug informatiion to Elastic
+    /*
     private final NetworkTable autoAlignTable =
     NetworkTableInstance.getDefault().getTable("AutoAlign");
 
-    // assists with debug informatiion to Elastic
-    /*
     private final NetworkTableEntry activeEntry = autoAlignTable.getEntry("active");
     private final NetworkTableEntry tagAllowedEntry = autoAlignTable.getEntry("tagAllowed");
     private final NetworkTableEntry txErrorEntry = autoAlignTable.getEntry("txError");
@@ -60,16 +60,16 @@ public class AutoAlignToTag extends Command {
     // 0.1 - 0.4, make negative
     double kP_turn = -0.06;
     // 0.03- 0.08
-    double kP_drive = 0.04;
+    double kP_drive = 0.07;
     // This needs to be replaced with the value given from the limelight exaclty
     // where we want it placed when shooting.
     // this will give a direct shot of the target regardless of where we are on the field.
-    double targetTY = 11.0;
+    double targetTY = 10.3;
 
 
     public AutoAlignToTag(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
-        addRequirements(drivetrain);
+        addRequirements(drivetrain);             
     }
 
     @Override
@@ -79,13 +79,7 @@ public class AutoAlignToTag extends Command {
 
         int tid = (int) LimelightHelpers.getFiducialID("limelight");
 
-        if (!LimelightHelpers.getTV("limelight")) {
-            stopAutoAlign();
-            drivetrain.setControl(new SwerveRequest.Idle());
-            return;
-        }
-
-        if (!isAllowedTag(tid)) {
+        if (!LimelightHelpers.getTV("limelight") || !isAllowedTag(tid)) {
             stopAutoAlign();
             drivetrain.setControl(new SwerveRequest.Idle());
             return;
@@ -97,11 +91,11 @@ public class AutoAlignToTag extends Command {
         double turn = tx * kP_turn;
 
         // Deadzone for aiming adjustment
-        if (Math.abs(tx) < 0.25)
+        if (Math.abs(tx) < 0.15)
             turn = 0;
 
         // Deadzone for distance adjustment
-        if (Math.abs(ty - targetTY) < 0.25)
+        if (Math.abs(ty - targetTY) < 0.07)
             drive = 0;
 
         // turn and drive the robot whilst allowing strafing (ideally)
