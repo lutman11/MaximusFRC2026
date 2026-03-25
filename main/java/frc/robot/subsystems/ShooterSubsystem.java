@@ -10,14 +10,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-// Make sure your LinearServo file is in the same folder, or import it if it's elsewhere!
-
 /**
  * Subsystem that handles shooting mechanism:
  * - Dragger motor
  * - Pull-up motor
  * - Flywheel motors 1 & 2
- * - Hood Linear Servo
  */
 public class ShooterSubsystem extends SubsystemBase {
 
@@ -25,10 +22,6 @@ public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX pullUp;
     private final TalonFX flyWheel1;
     private final TalonFX flyWheel2;
-
-    // --- ADD THE SERVO HERE ---
-    // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
-    private final LinearServo hoodServo; 
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
@@ -49,9 +42,6 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel1 = new TalonFX(CAN_ID_FLYWHEEL1);
         flyWheel2 = new TalonFX(CAN_ID_FLYWHEEL2);
 
-        // Initialize the servo
-        hoodServo = new LinearServo(3, 70.0, 10.0); 
-
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -60,13 +50,6 @@ public class ShooterSubsystem extends SubsystemBase {
         pullUp.getConfigurator().apply(config);
         flyWheel1.getConfigurator().apply(config);
         flyWheel2.getConfigurator().apply(config);
-    }
-
-    // --- CRITICAL: ADD PERIODIC LOOP FOR SERVO MATH ---
-    @Override
-    public void periodic() {
-        // This runs every 20ms to keep your estimated position accurate
-        hoodServo.updateCurPos();
     }
 
     /** Starts flywheel motors immediately */
@@ -96,25 +79,19 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void feederReverse(){
         dragger.set(DRAGGER_SPEED_R);
-        pullUp.set(PULLUP_SPEED_R);
-    }
+        pullUp.set(PULLUP_SPEED_R);}
 
     public void flywheelReverse(){
         flyWheel1.set(-FLYWHEEL_SPEED_R);
         flyWheel2.set(FLYWHEEL_SPEED_R);
+        
     }
-    
     public void draggerReverse() {
         dragger.set(DRAGGER_SPEED_R);
     }
-    
     public void stopDragger() {
         dragger.set(0);
     }
-
-    // ==========================================
-    // COMMAND FACTORIES
-    // ==========================================
 
     /** Returns a command that runs the shooter while held */
     public Command getShootCommand() {
@@ -148,16 +125,5 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.run(() -> draggerReverse(), this)
             .until(() -> false
         ).finallyDo(interrupted -> stopDragger());
-    }
-
-    // --- NEW HOOD COMMANDS ---
-    public Command setHoodExtendedCommand() {
-        // Moves the servo to 70mm
-        return Commands.runOnce(() -> hoodServo.setPosition(70.0), this);
-    }
-
-    public Command setHoodRetractedCommand() {
-        // Moves the servo to 0mm
-        return Commands.runOnce(() -> hoodServo.setPosition(0.0), this);
     }
 }
