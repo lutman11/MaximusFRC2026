@@ -17,7 +17,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -62,8 +61,6 @@ public class RobotContainer {
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     private final ShooterSubsystem shooter = new ShooterSubsystem();
-
-    private final ShooterSubsystem reverseDragger = new ShooterSubsystem();
 
     private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
 
@@ -137,8 +134,6 @@ public class RobotContainer {
         // Warmup PathPlanner to avoid Java pauses
         FollowPathCommand.warmupCommand().schedule();
 
-        //  Linear Servo Constants
-         //linearServo = new LinearServo(3, 70, 0);
     }
 
     private void configureBindings() {
@@ -209,18 +204,9 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-    /*
-        // Joystick control Controlling Servo
-        joystick.x().onTrue(Commands.runOnce(() -> {
-            linearServo.setPosition(70.0); // extend
-        }));
-
-        joystick.y().onTrue(Commands.runOnce(() -> {
-            linearServo.setPosition(0.0); // retract
-        }));
-
-          Commands.run(() -> linearServo.updateCurPos()).schedule();
-    */
+        // NEW HOOD SERVO CONTROLS (Using A and B buttons)
+        joystick.x().onTrue(shooter.setHoodExtendedCommand());
+        joystick.y().onTrue(shooter.setHoodRetractedCommand());
         
         // Intake is a motor that is controlled by the rightBumper (default), leftBumper (reverse), x (fast), and y (slow)
         // Primary intake commands
@@ -233,18 +219,20 @@ public class RobotContainer {
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(INTAKE_STOP)));
+        
         reverseIntakeTrigger.whileTrue(
             Commands.parallel(
-                Commands.run(() -> reverseDragger.reverseShootCommand()),
-                Commands.run(() -> reverseDragger.draggerReverse()),
+                shooter.reverseShootCommand(),
+                Commands.run(() -> shooter.draggerReverse(), shooter),
                 Commands.run(() -> fuelIntake.set(REVERSE_INTAKE_MOTOR_SPEED))
             )
             ).whileFalse( 
                 Commands.parallel(
-                    Commands.run(() -> reverseDragger.stopDragger()),
+                    Commands.run(() -> shooter.stopDragger(), shooter),
                     Commands.run(() -> fuelIntake.set(INTAKE_STOP))
                 )
             );
+            
         intakeAdjustTrigger.onTrue(
             Commands.deadline(
                 battleBus.intakeJostle(),
@@ -253,8 +241,8 @@ public class RobotContainer {
                     () -> fuelIntake.set(INTAKE_STOP)
                 ),
                 Commands.runEnd(
-                    () -> reverseDragger.startDragger(),
-                    () -> reverseDragger.stopDragger()
+                    () -> shooter.startDragger(),
+                    () -> shooter.stopDragger()
                 )
             )
         );
@@ -276,7 +264,7 @@ public class RobotContainer {
         
     }
 
-   /*    
+   /* 
        // Climber goes up
         joystick.povDown().whileTrue(Commands.run(() -> {
            endGame.set(ENDGAME_MOTOR_SPEED);
