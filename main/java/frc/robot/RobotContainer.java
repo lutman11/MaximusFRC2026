@@ -225,7 +225,7 @@ public class RobotContainer {
 
         Trigger intakeTrigger = joystick.rightBumper().or(leftJoystickMoved.and(joystick.rightBumper()));
         Trigger reverseIntakeTrigger = joystick.leftBumper().or(leftJoystickMoved.and(joystick.leftBumper()));
-        Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
+        //Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(INTAKE_STOP)));
@@ -291,17 +291,16 @@ public class RobotContainer {
 */
 
     private void updateDriveModeDashboard() {
-        if (UltraslowMode) {
+    if (UltraslowMode) {
         SmartDashboard.putString("Drive Mode", "Ultra Slow");
-        else if (slowMode) {
+    } else if (slowMode) {
         SmartDashboard.putString("Drive Mode", "Slow");
-        } else if (fastMode) {
+    } else if (fastMode) {
         SmartDashboard.putString("Drive Mode", "Fast");
-        } else {
-        SmartDashboard.putString("Drive Mode", "Normal"); // Or "Default", or whatever you want to call it
-        }
-     }
+    } else {
+        SmartDashboard.putString("Drive Mode", "Normal");
     }
+}
     
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
