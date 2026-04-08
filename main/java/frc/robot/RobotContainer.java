@@ -92,6 +92,7 @@ public class RobotContainer {
      // slowMode variables
      private boolean slowMode = false;
      private boolean fastMode = false;
+     private boolean UltraslowMode = false;
 
      public RobotContainer() {
 
@@ -137,8 +138,16 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-
-            joystick.povLeft().onTrue(Commands.runOnce(() -> {  // Use onTrue() to toggle slowMode
+        
+        joystick.b().onTrue(Commands.runOnce(() -> {
+            UltraslowMode = !UltraslowMode; // toggle ultra slow mode
+            slowMode = false;              
+            fastMode = false;     
+            updateDriveModeDashboard();
+        }, drivetrain));
+        
+        joystick.povLeft().onTrue(Commands.runOnce(() -> {  
+            // Use onTrue() to toggle slowMode
             slowMode = !slowMode; // Toggle slow mode
             fastMode = false;
             updateDriveModeDashboard();
@@ -157,6 +166,10 @@ public class RobotContainer {
              drivetrain.applyRequest(() -> {
                 double speedFactor;
                 double rotationFactor;
+                if(UltraslowMode){
+                    speedFactor = 0.1;
+                    rotationFactor = 0.1;
+                }
                 if(slowMode){
                     speedFactor = 0.2;
                     rotationFactor = 0.3;
@@ -281,6 +294,8 @@ public class RobotContainer {
 */
 
     private void updateDriveModeDashboard() {
+        if (UltraslowMode) {
+        SmartDashboard.putString("Drive Mode", "Ultra Slow");
         if (slowMode) {
         SmartDashboard.putString("Drive Mode", "Slow");
         } else if (fastMode) {
