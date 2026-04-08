@@ -28,6 +28,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // --- ADD THE SERVO HERE ---
     // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
+    private final com.revrobotics.servohub.ServoHub servoHub;
     private final LinearServo hoodServo; 
 
     private static final int CAN_ID_DRAGGER = 19;
@@ -49,9 +50,15 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel1 = new TalonFX(CAN_ID_FLYWHEEL1);
         flyWheel2 = new TalonFX(CAN_ID_FLYWHEEL2);
 
-        // Initialize the servo
-        hoodServo = new LinearServo(3, 70.0, 10.0); 
+        // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
+        this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
+        this.hoodServo = new LinearServo(
+            servoHub.getServoChannel(com.revrobotics.servohub.ServoHub.ChannelId.kChannelId3), 
+            70.0, 
+            10.0
+        );
 
+        // Motor configuration (Don't lose this part!)
         TalonFXConfiguration config = new TalonFXConfiguration();
         config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -61,7 +68,6 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel1.getConfigurator().apply(config);
         flyWheel2.getConfigurator().apply(config);
     }
-
     // --- CRITICAL: ADD PERIODIC LOOP FOR SERVO MATH ---
     @Override
     public void periodic() {
