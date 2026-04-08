@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
+import com.revrobotics.servohub.ServoChannel.ChannelId;
+
 // Make sure your LinearServo file is in the same folder, or import it if it's elsewhere!
 
 /**
@@ -53,7 +55,7 @@ public class ShooterSubsystem extends SubsystemBase {
         // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
         this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
         this.hoodServo = new LinearServo(
-            servoHub.getServoChannel(com.revrobotics.servohub.ServoHub.ChannelId.kChannelId3), 
+            servoHub.getServoChannel(ChannelId.kChannelId3), 
             70.0, 
             10.0
         );
