@@ -36,7 +36,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
-//import frc.robot.subsystems.LinearServo;
+import frc.robot.subsystems.LinearServo;
 import frc.robot.subsystems.ChainSubsystem;
 import frc.robot.commands.AutoAlignToTag;
 
@@ -64,7 +64,7 @@ public class RobotContainer {
 
     private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
 
-    //private final LinearServo linearServo;
+    private final LinearServo linearServo = new LinearServo(0, 0, 0);
 
     private final ChainSubsystem battleBus = new ChainSubsystem();
     
@@ -169,7 +169,7 @@ public class RobotContainer {
                     speedFactor = 0.1;
                     rotationFactor = 0.1;
                 }
-                if(slowMode){
+                else if(slowMode){
                     speedFactor = 0.2;
                     rotationFactor = 0.3;
                 }
@@ -216,7 +216,7 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // NEW HOOD SERVO CONTROLS (Using A and B buttons)
+        // NEW HOOD SERVO CONTROLS (Using X and Y buttons)
         joystick.x().onTrue(shooter.setHoodExtendedCommand());
         joystick.y().onTrue(shooter.setHoodRetractedCommand());
         
@@ -303,6 +303,7 @@ public class RobotContainer {
         SmartDashboard.putString("Drive Mode", "Normal"); // Or "Default", or whatever you want to call it
         }
      }
+    }
     
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
