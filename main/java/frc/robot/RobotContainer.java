@@ -64,8 +64,6 @@ public class RobotContainer {
 
     private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
 
-    private final LinearServo linearServo = new LinearServo(0, 0, 0);
-
     private final ChainSubsystem battleBus = new ChainSubsystem();
     
 
@@ -294,15 +292,14 @@ public class RobotContainer {
 
     private void updateDriveModeDashboard() {
         if (UltraslowMode) {
-        SmartDashboard.putString("Drive Mode", "Ultra Slow");
-        if (slowMode) {
-        SmartDashboard.putString("Drive Mode", "Slow");
+            SmartDashboard.putString("Drive Mode", "Ultra Slow");
+        } else if (slowMode) {
+            SmartDashboard.putString("Drive Mode", "Slow");
         } else if (fastMode) {
-        SmartDashboard.putString("Drive Mode", "Fast");
+            SmartDashboard.putString("Drive Mode", "Fast");
         } else {
-        SmartDashboard.putString("Drive Mode", "Normal"); // Or "Default", or whatever you want to call it
+            SmartDashboard.putString("Drive Mode", "Normal");
         }
-     }
     }
     
     public Command getAutonomousCommand() {
