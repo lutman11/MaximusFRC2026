@@ -87,6 +87,10 @@ public class AutoAlignToTag extends Command {
 
         double tx = LimelightHelpers.getTX("limelight");
         double ty = LimelightHelpers.getTY("limelight");
+
+        double offset = getAdjustmentValue();
+        tx = tx + offset;
+        
         double drive = -(ty - targetTY) * kP_drive;
         double turn = tx * kP_turn;
             
@@ -128,7 +132,10 @@ public class AutoAlignToTag extends Command {
         System.out.println("tx: " + tx);
         System.out.println("ty: " + ty);
         System.out.println("Aligning to tag: " + tid);
+    }
 
+    // put the method thing into the actual code so that this actually does something
+    double getAdjustmentValue(){
         // auto-adjust
         double[] BotPose = LimelightHelpers.getBotPose_wpiBlue("limelight");
         double bfx = BotPose[0];
@@ -137,25 +144,19 @@ public class AutoAlignToTag extends Command {
         final double FX = 16.54;
         final double FY = 8.07;
 
-        // put the method thing into the actual code so that this actually does something
-        double getAdjustmentValue(){
-            if (bfx < (FX/2)) {
-                if (bfy < (FY/2)) {
-                    return adjustment;
-                } else {
-                    return -adjustment;
-                }
+        if (bfx < (FX/2)) {
+            if (bfy < (FY/2)) {
+                return adjustment;
             } else {
-                if (bfy < (FY/2)) {
-                    return -adjustment;
-                } else {
-                    return adjustment;
-                }
+                return -adjustment;
+             }
+         } else {
+             if (bfy < (FY/2)) {
+                 return -adjustment;
+             } else {
+                  return adjustment;
             }
         }
-
-
-        
     }
 
     @Override
