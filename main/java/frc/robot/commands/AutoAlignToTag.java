@@ -87,6 +87,10 @@ public class AutoAlignToTag extends Command {
 
         double tx = LimelightHelpers.getTX("limelight");
         double ty = LimelightHelpers.getTY("limelight");
+
+        double offset = getAdjustmentValue();
+        tx = tx + offset;
+
         double drive = -(ty - targetTY) * kP_drive;
         double turn = tx * kP_turn;
             
@@ -128,35 +132,24 @@ public class AutoAlignToTag extends Command {
         System.out.println("tx: " + tx);
         System.out.println("ty: " + ty);
         System.out.println("Aligning to tag: " + tid);
-
-        // auto-adjust
-        double[] BotPose = LimelightHelpers.getBotPose_wpiBlue("limelight");
-        double bfx = BotPose[0];
-        double bfy = BotPose[1];
-        final double adjustment = 3.0;
-        final double FX = 16.54;
-        final double FY = 8.07;
-
-        // put the method thing into the actual code so that this actually does something
-        double getAdjustmentValue(){
-            if (bfx < (FX/2)) {
-                if (bfy < (FY/2)) {
-                    return adjustment;
-                } else {
-                    return -adjustment;
-                }
-            } else {
-                if (bfy < (FY/2)) {
-                    return -adjustment;
-                } else {
-                    return adjustment;
-                }
-            }
-        }
-
-
-        
     }
+
+    // put the method thing into the actual code so that this actually does something
+double getAdjustmentValue() {
+    double[] botPose = LimelightHelpers.getBotPose_wpiBlue("limelight");
+    double bfx = botPose[0];
+    double bfy = botPose[1];
+    
+    final double FX = 16.54;
+    final double FY = 8.07;
+    final double adjustment = 3.0;
+
+    // The Logic Gate formatting
+    boolean isRightHalf = bfy < (FY / 2);
+    boolean isBlueAlliance = bfx < (FX / 2);
+
+    return (isBlueAlliance == isRightHalf) ? adjustment : -adjustment;
+} 
 
     @Override
     public void end(boolean interrupted) {
