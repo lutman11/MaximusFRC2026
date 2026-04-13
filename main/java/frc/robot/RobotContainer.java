@@ -214,9 +214,9 @@ public class RobotContainer {
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // NEW HOOD SERVO CONTROLS (Using X and Y buttons)
-        joystick.x().onTrue(shooter.setHoodExtendedCommand());
-        joystick.y().onTrue(shooter.setHoodRetractedCommand());
+        // NEW HOOD SERVO CONTROLS (Using A and B button)
+        joystick.a().onTrue(shooter.setHoodExtendedCommand());
+        joystick.b().onTrue(shooter.setHoodRetractedCommand());
         
         // Intake is a motor that is controlled by the rightBumper (default), leftBumper (reverse), x (fast), and y (slow)
         // Primary intake commands
@@ -225,7 +225,7 @@ public class RobotContainer {
 
         Trigger intakeTrigger = joystick.rightBumper().or(leftJoystickMoved.and(joystick.rightBumper()));
         Trigger reverseIntakeTrigger = joystick.leftBumper().or(leftJoystickMoved.and(joystick.leftBumper()));
-        //Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
+        Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(INTAKE_STOP)));
@@ -288,7 +288,7 @@ public class RobotContainer {
             endGame.set(0);
         }, drivetrain));
     }
-*/
+    */
 
     private void updateDriveModeDashboard() {
     if (UltraslowMode) {
