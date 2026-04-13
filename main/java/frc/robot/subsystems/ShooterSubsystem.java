@@ -31,8 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- ADD THE SERVO HERE ---
     // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
     private final com.revrobotics.servohub.ServoHub servoHub;
-    private final LinearServo hoodServo1;
-    private final LinearServo hoodServo2;
+    private final LinearServo hoodServo;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
@@ -55,13 +54,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
         this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
-        this.hoodServo1 = new LinearServo(
-            servoHub.getServoChannel(ChannelId.kChannelId3), 
-            70.0, 
-            10.0
-        );
-        this.hoodServo2 = new LinearServo(
-            servoHub.getServoChannel(ChannelId.kChannelId4), 
+        this.hoodServo = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId0), 
             70.0, 
             10.0
         );
@@ -80,8 +74,7 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This runs every 20ms to keep your estimated position accurate
-        hoodServo1.updateCurPos();
-        hoodServo2.updateCurPos();
+        hoodServo.updateCurPos();
     }
 
     /** Starts flywheel motors immediately */
@@ -167,15 +160,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command setHoodExtendedCommand() {
         return Commands.runOnce(() -> {
-            hoodServo1.setPosition(70.0);
-            hoodServo2.setPosition(70.0);
+        hoodServo.setPosition(70.0);
         }, this);
     }
 
     public Command setHoodRetractedCommand() {
         return Commands.runOnce(() -> {
-            hoodServo1.setPosition(0.0);
-            hoodServo2.setPosition(0.0);
+        hoodServo.setPosition(0.0);
         }, this);
-    }
+    }        
 }
