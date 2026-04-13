@@ -82,22 +82,21 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         hoodServoL.updateCurPos();
         hoodServoR.updateCurPos();
-
-        hoodServoL.setPosition(hoodTarget);
-        hoodServoR.setPosition(hoodTarget);
     }
 
     public void setHoodTarget(double pos) {
         hoodTarget = pos;
+        hoodServoL.setPosition(pos);
+        hoodServoR.setPosition(pos);
     }
 
     public Command setHoodExtendedCommand() {
         return Commands.runOnce(() -> setHoodTarget(70.0), this);
     }
 
-public Command setHoodRetractedCommand() {
-    return Commands.runOnce(() -> setHoodTarget(0.0), this);
-}
+    public Command setHoodRetractedCommand() {
+        return Commands.runOnce(() -> setHoodTarget(0.0), this);
+    }
 
     /** Starts flywheel motors immediately */
     public void startFlywheels() {
@@ -178,26 +177,5 @@ public Command setHoodRetractedCommand() {
         return Commands.run(() -> draggerReverse(), this)
             .until(() -> false
         ).finallyDo(interrupted -> stopDragger());
-    }
-
-    public Command setHoodExtendedCommand() {
-        return Commands.runEnd(
-            () -> {
-                hoodServoL.setPosition(70.0);
-                hoodServoR.setPosition(70.0);
-            },
-            () -> {
-                hoodServoL.setPosition(70.0);
-                hoodServoR.setPosition(70.0);
-         },
-            this
-    );
-}
-
-        public Command setHoodRetractedCommand() {
-        return Commands.runOnce(() -> {
-            hoodServoL.setPosition(0.0);
-            hoodServoR.setPosition(0.0);
-        }, this);
-    }      
+    }  
 }
