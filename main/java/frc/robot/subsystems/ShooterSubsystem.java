@@ -31,7 +31,9 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- ADD THE SERVO HERE ---
     // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
     private final com.revrobotics.servohub.ServoHub servoHub;
-    private final LinearServo hoodServo;
+    private final LinearServo hoodServoL;
+    private final LinearServo hoodServoR;
+    private double hoodTarget = 70.0;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
@@ -54,9 +56,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Initialize the REV Servo Hub (Double-check CAN ID 40 in REV Hardware Client!)
         this.servoHub = new com.revrobotics.servohub.ServoHub(40); 
-        this.hoodServo = new LinearServo(
-            servoHub.getServoChannel(ChannelId.kChannelId2), 
-            70.0, 
+        this.hoodServoL = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId0),
+            70.0,
+            10.0
+        );
+        this.hoodServoR = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId1),
+            70.0,
             10.0
         );
 
@@ -73,9 +80,24 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- CRITICAL: ADD PERIODIC LOOP FOR SERVO MATH ---
     @Override
     public void periodic() {
-        // This runs every 20ms to keep your estimated position accurate
-        hoodServo.updateCurPos();
+        hoodServoL.updateCurPos();
+        hoodServoR.updateCurPos();
+
+        hoodServoL.setPosition(hoodTarget);
+        hoodServoR.setPosition(hoodTarget);
     }
+
+    public void setHoodTarget(double pos) {
+        hoodTarget = pos;
+    }
+
+    public Command setHoodExtendedCommand() {
+        return Commands.runOnce(() -> setHoodTarget(70.0), this);
+    }
+
+public Command setHoodRetractedCommand() {
+    return Commands.runOnce(() -> setHoodTarget(0.0), this);
+}
 
     /** Starts flywheel motors immediately */
     public void startFlywheels() {
@@ -159,14 +181,23 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Command setHoodExtendedCommand() {
-        return Commands.runOnce(() -> {
-        hoodServo.setPosition(70.0);
-        }, this);
-    }
+        return Commands.runEnd(
+            () -> {
+                hoodServoL.setPosition(70.0);
+                hoodServoR.setPosition(70.0);
+            },
+            () -> {
+                hoodServoL.setPosition(70.0);
+                hoodServoR.setPosition(70.0);
+         },
+            this
+    );
+}
 
-    public Command setHoodRetractedCommand() {
+        public Command setHoodRetractedCommand() {
         return Commands.runOnce(() -> {
-        hoodServo.setPosition(0.0);
+            hoodServoL.setPosition(0.0);
+            hoodServoR.setPosition(0.0);
         }, this);
-    }        
+    }      
 }
