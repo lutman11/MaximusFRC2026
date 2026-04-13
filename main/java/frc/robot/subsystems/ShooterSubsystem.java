@@ -52,10 +52,10 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel1 = new TalonFX(CAN_ID_FLYWHEEL1);
         flyWheel2 = new TalonFX(CAN_ID_FLYWHEEL2);
 
-        // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
-        this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
+        // Initialize the REV Servo Hub (Double-check CAN ID 40 in REV Hardware Client!)
+        this.servoHub = new com.revrobotics.servohub.ServoHub(40); 
         this.hoodServo = new LinearServo(
-            servoHub.getServoChannel(ChannelId.kChannelId0), 
+            servoHub.getServoChannel(ChannelId.kChannelId2), 
             70.0, 
             10.0
         );
