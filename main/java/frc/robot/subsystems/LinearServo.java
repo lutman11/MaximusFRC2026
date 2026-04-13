@@ -23,21 +23,23 @@ public class LinearServo {
 
     public void setPosition(double setpoint) {
         setPos = MathUtil.clamp(setpoint, 0.0, m_length);
-        double percentExtension = setPos / m_length;
-        // Map 0-100% to 1000-2000 microseconds
-        int pulseWidth = (int) (1000 + (percentExtension * 1000));
-        m_channel.setPulseWidth(pulseWidth);
     }
 
     public void updateCurPos() {
-        double currentTime = Timer.getFPGATimestamp();
-        double dt = currentTime - lastTime;
-        lastTime = currentTime;
-        double maxDelta = m_speed * dt;
-        if (curPos < setPos - maxDelta) curPos += maxDelta;
-        else if (curPos > setPos + maxDelta) curPos -= maxDelta;
-        else curPos = setPos;
-    }
+    double currentTime = Timer.getFPGATimestamp();
+    double dt = currentTime - lastTime;
+    lastTime = currentTime;
+
+    double maxDelta = m_speed * dt;
+
+    if (curPos < setPos - maxDelta) curPos += maxDelta;
+    else if (curPos > setPos + maxDelta) curPos -= maxDelta;
+    else curPos = setPos;
+
+    double percentExtension = MathUtil.clamp(curPos / m_length, 0.0, 1.0);
+    int pulseWidth = (int) (1000 + (percentExtension * 1000));
+    m_channel.setPulseWidth(pulseWidth);
+}
 
     public double getPosition() { return curPos; }
     public boolean isFinished() { return Math.abs(curPos - setPos) < 0.5; }
