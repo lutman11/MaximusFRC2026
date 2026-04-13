@@ -31,7 +31,8 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- ADD THE SERVO HERE ---
     // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
     private final com.revrobotics.servohub.ServoHub servoHub;
-    private final LinearServo hoodServo; 
+    private final LinearServo hoodServo1;
+    private final LinearServo hoodServo2;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
@@ -54,8 +55,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
         this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
-        this.hoodServo = new LinearServo(
+        this.hoodServo1 = new LinearServo(
             servoHub.getServoChannel(ChannelId.kChannelId3), 
+            70.0, 
+            10.0
+        );
+        this.hoodServo2 = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId4), 
             70.0, 
             10.0
         );
@@ -74,7 +80,8 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This runs every 20ms to keep your estimated position accurate
-        hoodServo.updateCurPos();
+        hoodServo1.updateCurPos();
+        hoodServo2.updateCurPos();
     }
 
     /** Starts flywheel motors immediately */
@@ -158,14 +165,17 @@ public class ShooterSubsystem extends SubsystemBase {
         ).finallyDo(interrupted -> stopDragger());
     }
 
-    // --- NEW HOOD COMMANDS ---
     public Command setHoodExtendedCommand() {
-        // Moves the servo to 70mm
-        return Commands.runOnce(() -> hoodServo.setPosition(70.0), this);
+        return Commands.runOnce(() -> {
+            hoodServo1.setPosition(70.0);
+            hoodServo2.setPosition(70.0);
+        }, this);
     }
 
     public Command setHoodRetractedCommand() {
-        // Moves the servo to 0mm
-        return Commands.runOnce(() -> hoodServo.setPosition(0.0), this);
+        return Commands.runOnce(() -> {
+            hoodServo1.setPosition(0.0);
+            hoodServo2.setPosition(0.0);
+        }, this);
     }
 }
