@@ -27,7 +27,7 @@ public class LinearServo {
 
     public void updateCurPos() {
         double currentTime = Timer.getFPGATimestamp();
-        double dt = currentTime - lastTime;
+        double dt = MathUtil.clamp(currentTime - lastTime, 0.0, 0.02);
         lastTime = currentTime;
 
     double maxDelta = m_speed * dt;
@@ -37,7 +37,11 @@ public class LinearServo {
         else curPos = setPos;
 
     double percentExtension = MathUtil.clamp(curPos / m_length, 0.0, 1.0);
-        int pulseWidth = (int) (1000 + (percentExtension * 1000));
+        int pulseWidth = (int) MathUtil.clamp(
+            1000 + percentExtension * 1000,
+            1000,
+            2000
+        );
         m_channel.setPulseWidth(pulseWidth);
     }
 
