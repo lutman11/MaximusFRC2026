@@ -66,9 +66,9 @@ public class ShooterSubsystem extends SubsystemBase {
             servoHub.getServoChannel(ChannelId.kChannelId1),
             100.0,
             25.0
+        );
 
         setHoodTarget(30.0);
-        );
 
         // Motor configuration (Don't lose this part!)
         TalonFXConfiguration config = new TalonFXConfiguration();
