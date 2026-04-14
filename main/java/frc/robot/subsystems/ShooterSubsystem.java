@@ -60,12 +60,12 @@ public class ShooterSubsystem extends SubsystemBase {
         this.hoodServoL = new LinearServo(
             servoHub.getServoChannel(ChannelId.kChannelId0),
             100.0,
-            25.0
+            30.0
         );
         this.hoodServoR = new LinearServo(
             servoHub.getServoChannel(ChannelId.kChannelId1),
             100.0,
-            25.0
+            30.0
         );
 
         // Motor configuration (Don't lose this part!)
