@@ -43,4 +43,13 @@ public class LinearServo {
 
     public double getPosition() { return curPos; }
     public boolean isFinished() { return Math.abs(curPos - setPos) < 0.5; }
+
+    public void setSafePosition(double mm) {
+        if (m_length < 30.0) {
+            // too small to reach 30mm safely, clamp to max instead
+            setPosition(m_length);
+        } else {
+            setPosition(mm);
+        }
+    }
 }
