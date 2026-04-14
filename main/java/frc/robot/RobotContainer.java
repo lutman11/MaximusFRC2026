@@ -211,9 +211,6 @@ public class RobotContainer {
         // reset the field-centric heading on start press
         joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // Reset the field-centric heading on start press.
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
         drivetrain.registerTelemetry(logger::telemeterize);
 
         // NEW HOOD SERVO CONTROLS (Using A and B button)
