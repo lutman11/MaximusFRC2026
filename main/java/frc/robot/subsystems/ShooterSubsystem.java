@@ -34,6 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final LinearServo hoodServoL;
     private final LinearServo hoodServoR;
     private double hoodTarget = 70.0;
+    private static final double HOOD_MAX = 70.0;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
@@ -58,12 +59,12 @@ public class ShooterSubsystem extends SubsystemBase {
         this.servoHub = new com.revrobotics.servohub.ServoHub(40); 
         this.hoodServoL = new LinearServo(
             servoHub.getServoChannel(ChannelId.kChannelId0),
-            70.0,
+            100.0,
             10.0
         );
         this.hoodServoR = new LinearServo(
             servoHub.getServoChannel(ChannelId.kChannelId1),
-            70.0,
+            100.0,
             10.0
         );
 
@@ -85,9 +86,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setHoodTarget(double pos) {
-        hoodTarget = pos;
-        hoodServoL.setPosition(pos);
-        hoodServoR.setPosition(pos);
+        hoodTarget = Math.max(0.0, Math.min(HOOD_MAX, pos));
+        hoodServoL.setPosition(hoodTarget);
+        hoodServoR.setPosition(hoodTarget);
     }
 
     public Command setHoodExtendedCommand() {
