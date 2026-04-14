@@ -301,6 +301,9 @@ public class RobotContainer {
     }
 }
     
+    public ShooterSubsystem getShooterSubsystem() {
+        return shooter;
+    }
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
