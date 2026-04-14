@@ -136,13 +136,15 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        
+
+        /*
         joystick.b().onTrue(Commands.runOnce(() -> {
             UltraslowMode = !UltraslowMode; // toggle ultra slow mode
             slowMode = false;              
             fastMode = false;     
             updateDriveModeDashboard();
         }, drivetrain));
+        */
         
         joystick.povLeft().onTrue(Commands.runOnce(() -> {  // Use onTrue() to toggle slowMode
             slowMode = !slowMode; // Toggle slow mode
