@@ -33,12 +33,12 @@ public class ShooterSubsystem extends SubsystemBase {
     private final com.revrobotics.servohub.ServoHub servoHub;
     private final LinearServo hoodServoL;
     private final LinearServo hoodServoR;
-    private double hoodTarget = 40.0;
-    private static final double HOOD_MAX = 40.0;
+    private double hoodTarget = 30.0;
+    private static final double HOOD_MAX = 30.0;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
-    private static final int CAN_ID_FLYWHEEL1 = 33;
+    private static final int CAN_ID_FLYWHEEL1 = 33; 
     private static final int CAN_ID_FLYWHEEL2 = 35;
 
     private static final double DRAGGER_SPEED = 0.3;
@@ -92,7 +92,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public Command setHoodExtendedCommand() {
-        return Commands.runOnce(() -> setHoodTarget(40.0), this);
+        return Commands.runOnce(() -> setHoodTarget(30.0), this);
     }
 
     public Command setHoodRetractedCommand() {
