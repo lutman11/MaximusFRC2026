@@ -89,13 +89,13 @@ public class AutoAlignToTag extends Command {
         double ty = LimelightHelpers.getTY("limelight");
         double drive = -(ty - targetTY) * kP_drive;
         double turn = tx * kP_turn;
-            
+
         // Deadzone for aiming adjustment
         if (Math.abs(tx) < 0.15)
             turn = 0;
 
         // Deadzone for distance adjustment
-        if (Math.abs(ty - targetTY) < 0.07)
+        if (Math.abs(ty - targetTY) < 0.2)
             drive = 0;
 
         // turn and drive the robot whilst allowing strafing (ideally)
@@ -129,33 +129,6 @@ public class AutoAlignToTag extends Command {
         System.out.println("ty: " + ty);
         System.out.println("Aligning to tag: " + tid);
 
-        // auto-adjust
-        double[] BotPose = LimelightHelpers.getBotPose_wpiBlue("limelight");
-        double bfx = BotPose[0];
-        double bfy = BotPose[1];
-        final double adjustment = 3.0;
-        final double FX = 16.54;
-        final double FY = 8.07;
-
-        // put the method thing into the actual code so that this actually does something
-        double getAdjustmentValue(){
-            if (bfx < (FX/2)) {
-                if (bfy < (FY/2)) {
-                    return adjustment;
-                } else {
-                    return -adjustment;
-                }
-            } else {
-                if (bfy < (FY/2)) {
-                    return -adjustment;
-                } else {
-                    return adjustment;
-                }
-            }
-        }
-
-
-        
     }
 
     @Override
@@ -167,8 +140,11 @@ public class AutoAlignToTag extends Command {
     }
 
     @Override
-    public boolean isFinished() {
-        return false;
+        public boolean isFinished() {
+        double tx = LimelightHelpers.getTX("limelight");
+        double ty = LimelightHelpers.getTY("limelight");
+
+        return Math.abs(tx) < 0.15 && Math.abs(ty - targetTY) < 0.2;
     }
 
 }
