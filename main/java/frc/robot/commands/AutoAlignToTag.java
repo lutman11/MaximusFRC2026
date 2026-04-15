@@ -87,6 +87,10 @@ public class AutoAlignToTag extends Command {
 
         double tx = LimelightHelpers.getTX("limelight");
         double ty = LimelightHelpers.getTY("limelight");
+
+        double offset = getAdjustmentValue();
+        tx = tx + offset;
+        
         double drive = -(ty - targetTY) * kP_drive;
         double turn = tx * kP_turn;
 
@@ -128,6 +132,7 @@ public class AutoAlignToTag extends Command {
         System.out.println("tx: " + tx);
         System.out.println("ty: " + ty);
         System.out.println("Aligning to tag: " + tid);
+    }
 
     }
 
