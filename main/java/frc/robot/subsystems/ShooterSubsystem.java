@@ -31,11 +31,14 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- ADD THE SERVO HERE ---
     // Port 3, 70mm max length, assuming roughly 10mm per second speed (tune this speed!)
     private final com.revrobotics.servohub.ServoHub servoHub;
-    private final LinearServo hoodServo; 
+    private final LinearServo hoodServoL;
+    private final LinearServo hoodServoR;
+    private double hoodTarget = 30.0;
+    private static final double HOOD_MAX = 30.0;
 
     private static final int CAN_ID_DRAGGER = 19;
     private static final int CAN_ID_PULLUP = 32;
-    private static final int CAN_ID_FLYWHEEL1 = 33;
+    private static final int CAN_ID_FLYWHEEL1 = 33; 
     private static final int CAN_ID_FLYWHEEL2 = 35;
 
     private static final double DRAGGER_SPEED = 0.3;
@@ -52,12 +55,17 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel1 = new TalonFX(CAN_ID_FLYWHEEL1);
         flyWheel2 = new TalonFX(CAN_ID_FLYWHEEL2);
 
-        // Initialize the REV Servo Hub (Double-check CAN ID 15 in REV Hardware Client!)
-        this.servoHub = new com.revrobotics.servohub.ServoHub(15); 
-        this.hoodServo = new LinearServo(
-            servoHub.getServoChannel(ChannelId.kChannelId3), 
-            70.0, 
-            10.0
+        // Initialize the REV Servo Hub (Double-check CAN ID 40 in REV Hardware Client!)
+        this.servoHub = new com.revrobotics.servohub.ServoHub(40); 
+        this.hoodServoL = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId0),
+            100.0,
+            25.0
+        );
+        this.hoodServoR = new LinearServo(
+            servoHub.getServoChannel(ChannelId.kChannelId1),
+            100.0,
+            25.0
         );
 
         // Motor configuration (Don't lose this part!)
@@ -73,8 +81,22 @@ public class ShooterSubsystem extends SubsystemBase {
     // --- CRITICAL: ADD PERIODIC LOOP FOR SERVO MATH ---
     @Override
     public void periodic() {
-        // This runs every 20ms to keep your estimated position accurate
-        hoodServo.updateCurPos();
+        hoodServoL.updateCurPos();
+        hoodServoR.updateCurPos();
+    }
+
+    public void setHoodTarget(double pos) {
+        hoodTarget = Math.max(0.0, Math.min(HOOD_MAX, pos));
+        hoodServoL.setPosition(hoodTarget);
+        hoodServoR.setPosition(hoodTarget);
+    }
+
+    public Command setHoodExtendedCommand() {
+        return Commands.runOnce(() -> setHoodTarget(30.0), this);
+    }
+
+    public Command setHoodRetractedCommand() {
+        return Commands.runOnce(() -> setHoodTarget(0.0), this);
     }
 
     /** Starts flywheel motors immediately */
@@ -156,16 +178,5 @@ public class ShooterSubsystem extends SubsystemBase {
         return Commands.run(() -> draggerReverse(), this)
             .until(() -> false
         ).finallyDo(interrupted -> stopDragger());
-    }
-
-    // --- NEW HOOD COMMANDS ---
-    public Command setHoodExtendedCommand() {
-        // Moves the servo to 70mm
-        return Commands.runOnce(() -> hoodServo.setPosition(70.0), this);
-    }
-
-    public Command setHoodRetractedCommand() {
-        // Moves the servo to 0mm
-        return Commands.runOnce(() -> hoodServo.setPosition(0.0), this);
-    }
+    }  
 }

@@ -136,13 +136,15 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        
+
+        /*
         joystick.b().onTrue(Commands.runOnce(() -> {
             UltraslowMode = !UltraslowMode; // toggle ultra slow mode
             slowMode = false;              
             fastMode = false;     
             updateDriveModeDashboard();
         }, drivetrain));
+        */
         
         joystick.povLeft().onTrue(Commands.runOnce(() -> {  // Use onTrue() to toggle slowMode
             slowMode = !slowMode; // Toggle slow mode
@@ -209,14 +211,11 @@ public class RobotContainer {
         // reset the field-centric heading on start press
         joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // Reset the field-centric heading on start press.
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
-
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // NEW HOOD SERVO CONTROLS (Using X and Y buttons)
-        joystick.x().onTrue(shooter.setHoodExtendedCommand());
-        joystick.y().onTrue(shooter.setHoodRetractedCommand());
+        // NEW HOOD SERVO CONTROLS (Using A and B button)
+        joystick.a().onTrue(shooter.setHoodExtendedCommand());
+        joystick.b().onTrue(shooter.setHoodRetractedCommand());
         
         // Intake is a motor that is controlled by the rightBumper (default), leftBumper (reverse), x (fast), and y (slow)
         // Primary intake commands
@@ -225,7 +224,7 @@ public class RobotContainer {
 
         Trigger intakeTrigger = joystick.rightBumper().or(leftJoystickMoved.and(joystick.rightBumper()));
         Trigger reverseIntakeTrigger = joystick.leftBumper().or(leftJoystickMoved.and(joystick.leftBumper()));
-        //Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
+        Trigger intakeAdjustTrigger = joystick.x().or(leftJoystickMoved.and(joystick.x()));
 
         intakeTrigger.whileTrue(Commands.run(() -> fuelIntake.set(INTAKE_MOTOR_SPEED)))
             .whileFalse(Commands.run(() -> fuelIntake.set(INTAKE_STOP)));
@@ -288,7 +287,7 @@ public class RobotContainer {
             endGame.set(0);
         }, drivetrain));
     }
-*/
+    */
 
     private void updateDriveModeDashboard() {
     if (UltraslowMode) {
@@ -302,6 +301,9 @@ public class RobotContainer {
     }
 }
     
+    public ShooterSubsystem getShooterSubsystem() {
+        return shooter;
+    }
     public Command getAutonomousCommand() {
         /* Run the path selected from the auto chooser */
         return autoChooser.getSelected();
