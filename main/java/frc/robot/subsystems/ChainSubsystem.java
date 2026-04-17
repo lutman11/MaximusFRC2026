@@ -19,7 +19,7 @@ public class ChainSubsystem extends SubsystemBase {
     private static final double CHAIN_REVERSE = -0.15;
     private static final double CHAIN_FORWARD_SLOW = 0.1;
 
-    private static final double CURRENT_LIMIT = 40.0;
+    private static final double CURRENT_LIMIT = 40.0; 
     private static final double VELOCITY_THRESHOLD = 1.0;
     private static final double STALL_DELAY = 0.1;
     private static final double DEFAULT_CHAIN_TIME = 1.0;
@@ -83,51 +83,19 @@ public class ChainSubsystem extends SubsystemBase {
 
     // Instant control commands
     public Command intakeDrop() {
-        Timer failsafeTimer = new Timer();
-        final double MAX_RUNTIME = 1.0;
-        boolean[] timerStarted = {false};
-        
-        return Commands.run(() -> {
-            
-            if (!timerStarted[0]){
-                failsafeTimer.reset();
-                failsafeTimer.start();
-                timerStarted[0] = true;
-            }
-
-            if (failsafeTimer.hasElapsed(MAX_RUNTIME)) {
-                stop();
-                return;
-            }
-
-            moveForward();
-
-        }, this)
-        .finallyDo(interrupted -> stop());
+        return Commands.startEnd(
+            () -> moveForward(),
+            () -> stop(),
+            this
+        ).withTimeout(1.0);
     }
 
     public Command intakeLift() {
-        Timer failsafeTimer = new Timer();
-        final double MAX_RUNTIME = 1.0;
-        boolean[] timerStarted = {false};
-        
-        return Commands.run(() -> {
-
-            if (!timerStarted[0]){
-                failsafeTimer.reset();
-                failsafeTimer.start();
-                timerStarted[0] = true;
-            }
-
-            if (failsafeTimer.hasElapsed(MAX_RUNTIME)) {
-                stop();
-                return;
-            }
-
-            moveReverse();
-
-        }, this
-            ).finallyDo(interrupted -> stop());
+        return Commands.startEnd(
+            () -> moveReverse(),
+            () -> stop(),
+            this
+        ).withTimeout(1.0);
     }
 
     public Command intakeJostle() {

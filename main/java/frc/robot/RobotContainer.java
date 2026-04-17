@@ -262,6 +262,9 @@ public class RobotContainer {
         joystick.rightTrigger(0.2)
         .whileTrue(shooter.getShootCommand());
 
+        joystick.y()
+        .whileTrue(shooter.getShootCommandSlow());
+
         joystick.leftTrigger(0.2)
         .whileTrue(autoAlign);
 

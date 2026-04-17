@@ -41,9 +41,10 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final int CAN_ID_FLYWHEEL1 = 33; 
     private static final int CAN_ID_FLYWHEEL2 = 35;
 
-    private static final double DRAGGER_SPEED = 0.3;
+    private static final double DRAGGER_SPEED = 0.45;
     private static final double PULLUP_SPEED = -0.4;
     private static final double FLYWHEEL_SPEED = -0.6;
+    private static final double FLYWHEEL_SPEED_SLOW = -0.55;
 
     private static final double DRAGGER_SPEED_R = -0.15;
     private static final double PULLUP_SPEED_R = 0.3;
@@ -105,6 +106,11 @@ public class ShooterSubsystem extends SubsystemBase {
         flyWheel2.set(FLYWHEEL_SPEED);
     }
 
+    public void startFlywheelsSlow() {
+        flyWheel1.set(-FLYWHEEL_SPEED_SLOW);
+        flyWheel2.set(FLYWHEEL_SPEED_SLOW);
+    }
+
     /** Starts dragger motors */
     public void startDragger() {
         dragger.set(DRAGGER_SPEED);
@@ -154,6 +160,14 @@ public class ShooterSubsystem extends SubsystemBase {
             Commands.run(() -> startFeeder(), this)
         ).finallyDo(interrupted -> stopShooter());
     }
+    public Command getShootCommandSlow() {
+        return Commands.sequence(
+            Commands.runOnce(() -> startFlywheelsSlow()),
+            new WaitCommand(.6),
+            Commands.run(() -> startFeeder(), this)
+        ).finallyDo(interrupted -> stopShooter());
+    }
+
     
     public Command reverseShootCommand() {
         return Commands.sequence(
