@@ -4,17 +4,19 @@
   "holonomicMode": true,
   "pathFolders": [
     "Bottom Shooter Depos",
-    "Middle Shoot Depos",
     "Centers",
+    "Middle Shoot Depos",
+    "merq",
     "Top Shooter Depos"
   ],
   "autoFolders": [
-    "Bottom Autos",
-    "Center Start Autos",
-    "Middle Autos",
-    "to work on",
-    "Top Autos",
-    "tests"
+    "Complex Center Autos",
+    "Complex Left Autos",
+    "Complex Right Autos",
+    "Gambling (defense) autos",
+    "Simple Left Autos",
+    "Simple Middle Autos",
+    "Simple Right Autos"
   ],
   "defaultMaxVel": 3.5,
   "defaultMaxAccel": 7.0,
