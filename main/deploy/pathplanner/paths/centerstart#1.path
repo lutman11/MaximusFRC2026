@@ -45,7 +45,7 @@
     "rotation": 32.00538320808338
   },
   "reversed": false,
-  "folder": "2026 stuff",
+  "folder": null,
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

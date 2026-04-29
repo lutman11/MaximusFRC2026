@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.685330188679245,
-        "y": 3.3386399371069184
+        "x": 2.7060141509433966,
+        "y": 2.5388600628930815
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6687004360483018,
-        "y": 3.5880862265710705
+        "x": 2.6893843983124532,
+        "y": 2.788306352357234
       },
       "isLocked": false,
       "linkedName": "Basic Trench Shoot Bottom End"
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 28.249735494974246
+    "rotation": 35.78897345918333
   },
   "useDefaultConstraints": true
 }
