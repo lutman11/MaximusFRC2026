@@ -52,8 +52,6 @@ public class AutoAlignToTag extends Command {
     @Override
     public void execute() {
 
-        System.out.println("AutoAlign Running");
-
         int tid = (int) LimelightHelpers.getFiducialID("limelight");
 
         if (!LimelightHelpers.getTV("limelight") || !isAllowedTag(tid)) {
@@ -85,8 +83,6 @@ public class AutoAlignToTag extends Command {
 
         
         // debug
-        System.out.println("tx: " + tx);
-        System.out.println("ty: " + ty);
         System.out.println("Aligning to tag: " + tid);
     }
 

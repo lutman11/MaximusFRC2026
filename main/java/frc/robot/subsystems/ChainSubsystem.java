@@ -95,7 +95,7 @@ public class ChainSubsystem extends SubsystemBase {
             () -> moveReverse(),
             () -> stop(),
             this
-        ).withTimeout(1.0);
+        ).withTimeout(2.0);
     }
 
     public Command intakeJostle() {

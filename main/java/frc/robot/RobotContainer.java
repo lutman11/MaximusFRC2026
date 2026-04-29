@@ -117,6 +117,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("shooterOn", shooter.getShootCommand());
 
+        NamedCommands.registerCommand("shooterOnFast", shooter.getShootCommandFast());
+
         NamedCommands.registerCommand("shooterStop", shooter.stopShooterCommand());
 
         NamedCommands.registerCommand("intakeLift", battleBus.intakeLift());
@@ -171,7 +173,7 @@ public class RobotContainer {
                 }
                 else if(slowMode){
                     speedFactor = 0.2;
-                    rotationFactor = 0.3;
+                    rotationFactor = 0.5;
                 }
                 else if(fastMode){
                     speedFactor = 1.0;
@@ -179,7 +181,7 @@ public class RobotContainer {
                 }
                 else{
                     speedFactor = 0.75;
-                    rotationFactor = 0.75;
+                    rotationFactor = 1.0;
                 }
                 return drive.withVelocityX(-joystick.getLeftY() * MaxSpeed* 0.5 * speedFactor) // Drive forward with negative Y (forward)
                     .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.5 * speedFactor) // Drive left with negative X (left)
