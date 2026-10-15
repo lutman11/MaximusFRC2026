@@ -11,8 +11,9 @@ public class AutoAlignToTag extends Command {
 
     private final SwerveRequest.FieldCentric driveRequest = new SwerveRequest.FieldCentric();
 
-    int[] allowedTags = {10,26};
+    int[] allowedTags = {10,26,11};
  
+
     @Override
     public void initialize() {
         System.out.println("AutoAlign started");

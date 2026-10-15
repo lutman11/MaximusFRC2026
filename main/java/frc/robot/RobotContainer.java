@@ -49,6 +49,15 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+    // 1. ADD THIS: Create a robot-centric configuration with identical deadband structures
+    private final SwerveRequest.RobotCentric robotDrive = new SwerveRequest.RobotCentric()
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+    // 2. ADD THIS: Boolean tracking state initialized to true (starts in field-centric)
+    private boolean isFieldCentric = true;
+
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     private final SwerveRequest.RobotCentric forwardStraight = new SwerveRequest.RobotCentric()
@@ -65,6 +74,7 @@ public class RobotContainer {
     private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
 
     private final ChainSubsystem battleBus = new ChainSubsystem();
+
     
 
     /* Path follower */
@@ -75,7 +85,7 @@ public class RobotContainer {
      private static final int CAN_IDFI = 30;
      private static final double INTAKE_MOTOR_SPEED = -0.8; // Change this value to adjust the motor speed
      private static final double SLOW_INTAKE_MOTOR_SPEED = -0.5; // currently commented out
-     private static final double FAST_INTAKE_MOTOR_SPEED = -0.8; // currently commented out
+     private static final double FAST_INTAKE_MOTOR_SPEED = -0.8; // old value is "-.8"
      private static final double REVERSE_INTAKE_MOTOR_SPEED = .125;
      private static final double INTAKE_AUTO = -0.8;
      private static final double INTAKE_STOP = 0;
@@ -183,11 +193,25 @@ public class RobotContainer {
                     speedFactor = 0.75;
                     rotationFactor = 1.0;
                 }
-                return drive.withVelocityX(-joystick.getLeftY() * MaxSpeed* 0.5 * speedFactor) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * 0.5 * speedFactor) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate * 0.5 * rotationFactor); // Drive counterclockwise with negative X (left)
+
+                // 1. Calculate the raw velocity values from the joystick inputs
+                double vx = -joystick.getLeftY() * MaxSpeed * 0.5 * speedFactor;
+                double vy = -joystick.getLeftX() * MaxSpeed * 0.5 * speedFactor;
+                double rx = -joystick.getRightX() * MaxAngularRate * 0.5 * rotationFactor;
+
+                // 2. Select between the field-centric or robot-centric configuration based on the toggle flag
+                if (isFieldCentric) {
+                    return drive.withVelocityX(vx)
+                                .withVelocityY(vy)
+                                .withRotationalRate(rx);
+                } else {
+                    return robotDrive.withVelocityX(vx)
+                                     .withVelocityY(vy)
+                                     .withRotationalRate(rx);
+                }
             })
         );
+
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -195,13 +219,16 @@ public class RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
-
+      
+        /*
         joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(0.5).withVelocityY(0))
         );
         joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
             forwardStraight.withVelocityX(-0.5).withVelocityY(0))
         );
+        (Absolutely useless code i think)
+        */
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -211,11 +238,15 @@ public class RobotContainer {
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on start press
-        joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        // Alternates drive orientation frame modes between field-centric and robot-centric
+        joystick.start().onTrue(Commands.runOnce(() -> {
+            isFieldCentric = !isFieldCentric;
+            SmartDashboard.putString("Drive Orientation", isFieldCentric ? "Field Centric" : "Robot Centric");
+        }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
-        // NEW HOOD SERVO CONTROLS (Using A and B button)
+        // Hood Servo Controls
         joystick.a().onTrue(shooter.setHoodExtendedCommand());
         joystick.b().onTrue(shooter.setHoodRetractedCommand());
         
@@ -264,7 +295,7 @@ public class RobotContainer {
         joystick.rightTrigger(0.2)
         .whileTrue(shooter.getShootCommand());
 
-        joystick.y()
+        joystick.x()
         .whileTrue(shooter.getShootCommandSlow());
 
         joystick.leftTrigger(0.2)
@@ -272,10 +303,6 @@ public class RobotContainer {
 
         joystick.rightStick()
         .onTrue(battleBus.intakeDrop());
-     
-        joystick.leftStick()
-        .onTrue(battleBus.intakeLift()); 
-        
     }
 
    /* 
