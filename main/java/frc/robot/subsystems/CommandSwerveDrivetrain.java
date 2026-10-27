@@ -36,6 +36,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.LimelightHelpers;
 
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
@@ -72,6 +75,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // Swerve request to allow movement via the limelight
     private final SwerveRequest.FieldCentric m_fieldCentric = new SwerveRequest.FieldCentric();
 
+    public void setFrontRightDriveCoast() {
+    // Configure the existing Front Right drive motor here.
+}
 
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(

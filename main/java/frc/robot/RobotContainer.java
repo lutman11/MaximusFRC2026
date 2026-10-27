@@ -39,6 +39,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.LinearServo;
 import frc.robot.subsystems.ChainSubsystem;
 import frc.robot.commands.AutoAlignToTag;
+import java.util.function.BooleanSupplier;
 
 
 public class RobotContainer {
@@ -56,7 +57,8 @@ public class RobotContainer {
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     // 2. ADD THIS: Boolean tracking state initialized to true (starts in field-centric)
-    private boolean isFieldCentric = true;
+        private boolean fieldCentricState = true;
+        private final BooleanSupplier isFieldCentric = () -> fieldCentricState;
 
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -74,8 +76,6 @@ public class RobotContainer {
     private final AutoAlignToTag autoAlign = new AutoAlignToTag(drivetrain);
 
     private final ChainSubsystem battleBus = new ChainSubsystem();
-
-    
 
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
@@ -100,7 +100,7 @@ public class RobotContainer {
      // slowMode variables
      private boolean slowMode = false;
      private boolean fastMode = false;
-     private boolean UltraslowMode = false;
+     private boolean ultraSlowMode = false;
 
      public RobotContainer() {
 
@@ -177,7 +177,7 @@ public class RobotContainer {
              drivetrain.applyRequest(() -> {
                 double speedFactor;
                 double rotationFactor;
-                if(UltraslowMode){
+                if(ultraSlowMode){
                     speedFactor = 0.1;
                     rotationFactor = 0.1;
                 }
@@ -200,7 +200,7 @@ public class RobotContainer {
                 double rx = -joystick.getRightX() * MaxAngularRate * 0.5 * rotationFactor;
 
                 // 2. Select between the field-centric or robot-centric configuration based on the toggle flag
-                if (isFieldCentric) {
+                if (isFieldCentric.getAsBoolean()) {
                     return drive.withVelocityX(vx)
                                 .withVelocityY(vy)
                                 .withRotationalRate(rx);
@@ -240,9 +240,15 @@ public class RobotContainer {
         // reset the field-centric heading on start press
         // Alternates drive orientation frame modes between field-centric and robot-centric
         joystick.start().onTrue(Commands.runOnce(() -> {
-            isFieldCentric = !isFieldCentric;
-            SmartDashboard.putString("Drive Orientation", isFieldCentric ? "Field Centric" : "Robot Centric");
-        }));
+            fieldCentricState = !fieldCentricState;
+
+        SmartDashboard.putString(
+           "Drive Orientation",
+             isFieldCentric.getAsBoolean()
+              ? "Field Centric"
+                : "Robot Centric"
+    );
+}));
 
         drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -295,8 +301,11 @@ public class RobotContainer {
         joystick.rightTrigger(0.2)
         .whileTrue(shooter.getShootCommand());
 
-        joystick.x()
-        .whileTrue(shooter.getShootCommandSlow());
+        joystick.y()
+        .whileTrue(shooter.getFeederJostleCommand());
+
+ /*      joystick.x()
+        .whileTrue(shooter.getShootCommandSlow()); */
 
         joystick.leftTrigger(0.2)
         .whileTrue(autoAlign);
@@ -322,7 +331,7 @@ public class RobotContainer {
     */
 
     private void updateDriveModeDashboard() {
-    if (UltraslowMode) {
+    if (ultraSlowMode) {
         SmartDashboard.putString("Drive Mode", "Ultra Slow");
     } else if (slowMode) {
         SmartDashboard.putString("Drive Mode", "Slow");

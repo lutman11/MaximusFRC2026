@@ -128,6 +128,18 @@ public class ShooterSubsystem extends SubsystemBase {
         pullUp.set(PULLUP_SPEED);
     }
 
+    public void startJostle() {
+        dragger.set(PULLUP_SPEED);
+    }
+
+    public void reverseJostle() {
+        dragger.set(-PULLUP_SPEED);
+    }
+
+    public void stopJostle() {
+        dragger.set(0);
+    }
+
     /** Stops the shooter motors */
     public void stopShooter() {
         dragger.set(0);
@@ -180,7 +192,15 @@ public class ShooterSubsystem extends SubsystemBase {
             Commands.run(() -> startFeeder(), this)
         ).finallyDo(interrupted -> stopShooter());
     }
-    
+        public Command getFeederJostleCommand() {
+        return Commands.sequence(
+            Commands.runOnce(() -> startJostle()),
+            new WaitCommand(.3),
+            Commands.runOnce(() -> reverseJostle()),
+            new WaitCommand(.3)
+        ).finallyDo(interrupted -> stopJostle());
+    }
+
     public Command reverseShootCommand() {
         return Commands.sequence(
             Commands.runOnce(() -> flywheelReverse())
